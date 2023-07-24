@@ -2,6 +2,7 @@
 
 $row-padding: 2px;
 $hover-padding: 3px;
+
 .rowWrapper {
   padding: 0;
   height: 100%;
@@ -39,13 +40,17 @@ $hover-padding: 3px;
   border: none !important;
   box-shadow: none !important;
   outline: none !important;
-  width: 500px;
+  width: 100%;
+  position: relative;
+  padding: 0;
+  z-index: -2;
   * {
     opacity: 0 !important;
   }
 
   &::before {
-    background-color: lightblue;
+    background-color: rgb(190, 213, 216);
+    opacity: 0.8;
     content: '';
     position: absolute;
     top: 0;
@@ -53,7 +58,6 @@ $hover-padding: 3px;
     bottom: 0;
     left: 0;
     z-index: -1;
-    width: 100%;
   }
 }
 
@@ -64,7 +68,7 @@ $hover-padding: 3px;
   @extend .rowLandingPad;
 
   &::before {
-    background-color: #e6a8ad;
+    background-color: #929292;
   }
 }
 
@@ -96,10 +100,8 @@ $hover-padding: 3px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: white;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  border-bottom: 1px solid #aaa;
-  padding: 10px 20px;
+  background-color: transparent;
+  padding: 10px 10px 10px 32px;
 }
 
 .rowLabel {
@@ -200,7 +202,9 @@ $hover-padding: 3px;
 }
 
 .rowTitle {
-  font-weight: bold;
+  font-weight: normal;
+  font-size: 80%;
+  color: white;
 }
 
 .rowTitleWithSubtitle {
@@ -209,12 +213,12 @@ $hover-padding: 3px;
 
 .rowSubtitle {
   font-size: 70%;
-  line-height: 0.7;
   width: 95%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   display: inline-block;
+  color: white;
 }
 
 .collapseButton,
@@ -223,15 +227,20 @@ $hover-padding: 3px;
   background: none;
   border: none;
   position: absolute;
-  width: 16px;
-  height: 16px;
+  width: 32px;
+  height: 32px;
   top: 50%;
-  padding-left: 120px;
+  left: 0;
   cursor: pointer;
   z-index: 1000;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
+  transform: translateY(-50%);
   &:focus {outline:0;}
+  color: #d9d9d9;
+  font-size: 10px;
+}
+
+.collapseButton {
+  font-size: 13px; //make font size larger on purpose since collapseButton content appears smaller than expandButton content
 }
 
 .collapseButton {

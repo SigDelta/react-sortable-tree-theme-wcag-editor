@@ -43,11 +43,11 @@ class MinimalThemeNodeContentRenderer extends Component {
       isOver, // Not needed, but preserved for other renderers
       parentNode, // Needed for dndManager
       rowDirection,
+      scaffoldBlockCount,
       ...otherProps
     } = this.props;
     const nodeTitle = title || node.title;
     const nodeSubtitle = subtitle || node.subtitle;
-
     const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
     const isLandingPadActive = !didDrop && isDragging;
     const nodeContent = connectDragPreview( <div
@@ -86,17 +86,6 @@ class MinimalThemeNodeContentRenderer extends Component {
             </span>
           )}
         </div>
-
-        <div className={styles.rowToolbar}>
-          {buttons.map((btn, index) => (
-            <div
-              key={index} // eslint-disable-line react/no-array-index-key
-              className={styles.toolbarButton}
-            >
-              {btn}
-            </div>
-          ))}
-        </div>
       </div>
     );
 
@@ -119,6 +108,7 @@ class MinimalThemeNodeContentRenderer extends Component {
                     treeIndex,
                   })
                 }
+              style={{marginLeft: scaffoldBlockPxWidth * scaffoldBlockCount }}
               />
 
               {node.expanded &&
@@ -146,7 +136,6 @@ class MinimalThemeNodeContentRenderer extends Component {
             }
             style={{
               opacity: isDraggedDescendant ? 0.5 : 1,
-              paddingLeft: scaffoldBlockPxWidth,
               ...style,
             }}
           >

@@ -64,6 +64,7 @@ class MinimalThemeTreeNodeRenderer extends Component {
               isOver,
               canDrop,
               draggedNode,
+              scaffoldBlockCount
             })
           )}
         </div>
