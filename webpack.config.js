@@ -3,12 +3,19 @@ const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
 const nodeExternals = require('webpack-node-externals');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const target = process.env.TARGET || 'umd';
 
+module.exports = {
+  optimization: {
+    minimizer: [new UglifyJsPlugin()]
+  }
+}
+
 const styleLoader = {
   loader: 'style-loader',
-  options: { insertAt: 'top' },
+  options: { insert: 'head' },
 };
 
 const fileLoader = {
@@ -19,10 +26,13 @@ const fileLoader = {
 const postcssLoader = {
   loader: 'postcss-loader',
   options: {
-    plugins: () => [
-      autoprefixer({ browsers: ['IE >= 9', 'last 2 versions', '> 1%'] }),
-    ],
-  },
+    postcssOptions: {
+
+      plugins: () => [
+        autoprefixer({ browsersList: ['IE >= 11', 'last 2 versions', '> 1%'] }),
+      ],
+    },
+  }
 };
 
 const cssLoader = isLocal => ({
@@ -46,15 +56,6 @@ const config = {
   devtool: 'source-map',
   plugins: [
     new webpack.EnvironmentPlugin({ NODE_ENV: 'development' }),
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-      },
-      mangle: false,
-      beautify: true,
-      comments: true,
-    }),
   ],
   module: {
     rules: [
@@ -83,7 +84,7 @@ switch (target) {
     config.externals = [
       nodeExternals({
         // load non-javascript files with extensions, presumably via loaders
-        whitelist: [/\.(?!(?:jsx?|json)$).{1,5}$/i],
+        allowlist: [/\.(?!(?:jsx?|json)$).{1,5}$/i],
       }),
     ];
     break;
@@ -108,9 +109,8 @@ switch (target) {
       new webpack.NoEmitOnErrorsPlugin(),
     ];
     config.devServer = {
-      contentBase: path.join(__dirname, 'build'),
+      // contentBase: path.join(__dirname, 'build'),
       port: process.env.PORT || 3001,
-      stats: 'minimal',
     };
 
     break;

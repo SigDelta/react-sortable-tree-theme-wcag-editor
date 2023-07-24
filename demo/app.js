@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import SortableTree, { toggleExpandedForAll } from 'react-sortable-tree';
+import SortableTree, { toggleExpandedForAll } from '@nosferatu500/react-sortable-tree';
 import CustomTheme from '../index';
 import './app.css';
 
@@ -12,11 +12,11 @@ class App extends Component {
       searchFocusIndex: 0,
       searchFoundCount: null,
       treeData: [
-        { title: 'This is the Full Node Drag theme' },
-        { title: 'You can click anywhere on the node to drag it' },
+        { title: 'Node 1' },
+        { title: 'Node 2' },
         {
-          title: 'This node has dragging disabled',
-          subtitle: 'Note how the hover behavior is different',
+          title: 'Node 3',
+          subtitle: 'This node is not draggable',
           dragDisabled: true,
         },
         { title: 'Chicken', children: [{ title: 'Egg' }] },
@@ -137,7 +137,7 @@ class App extends Component {
           </form>
         </div>
 
-        <div style={{ flex: '1 0 50%', padding: '0 0 0 15px' }}>
+        <div style={{ flex: '1 0 50%', padding: '0 0 0 15px', height: '400px' }}>
           <SortableTree
             theme={CustomTheme}
             treeData={treeData}

@@ -1,15 +1,12 @@
+@use "sass:math";
+
 $row-padding: 2px;
 $hover-padding: 3px;
 .rowWrapper {
-  padding: $row-padding $row-padding $row-padding 0;
+  padding: 0;
   height: 100%;
   box-sizing: border-box;
   cursor: move;
-
-  &:hover {
-    opacity: 0.7;
-    padding: $hover-padding $hover-padding $hover-padding 0;
-  }
 
   &:active {
     opacity: 1;
@@ -18,6 +15,8 @@ $hover-padding: 3px;
 
 .rowWrapperDragDisabled {
   cursor: default;
+  user-select: none;
+
   &:hover {
     opacity: 1;
   }
@@ -92,7 +91,6 @@ $hover-padding: 3px;
   @extend %rowItem;
   position: relative;
   height: 100%;
-  padding: 0 5px 0 30px;
   min-width: 230px;
   flex: 1 0 auto;
   display: flex;
@@ -100,11 +98,8 @@ $hover-padding: 3px;
   justify-content: space-between;
   background-color: white;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
-  &:hover {
-    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
-    box-shadow: 0 5px 10px rgba(0,0,0,0.19), 0 3px 3px rgba(0,0,0,0.23);
-  }
+  border-bottom: 1px solid #aaa;
+  padding: 10px 20px;
 }
 
 .rowLabel {
@@ -181,20 +176,20 @@ $hover-padding: 3px;
     animation: pointFade $spin-animation-time infinite ease-in-out both;
   }
 
-  @for $i from 1 through (($point-count + 1) / 2) {
+  @for $i from 1 through calc(($point-count) / 2) {
     &:nth-of-type(#{$i}) {
-      transform: rotate(360deg / $point-count * ($i - 1));
+      transform: rotate(math.div(360deg, $point-count) * ($i - 1));
     }
 
-    &:nth-of-type(#{$i + $point-count / 2}) {
-      transform: rotate(180deg + 360deg / $point-count * ($i - 1));
+    &:nth-of-type(#{math.div($i + $point-count, 2)}) {
+      transform: rotate(math.div(180deg + 360deg, $point-count) * ($i - 1));
     }
 
     &:nth-of-type(#{$i}),
-    &:nth-of-type(#{$i + $point-count / 2}) {
+    &:nth-of-type(#{math.div($i + $point-count, 2)}) {
       &:before {
-        animation-delay: - $spin-animation-time + ($spin-animation-time /
-              $point-count * 2 * ($i - 1));
+        animation-delay: - $spin-animation-time + (math.div($spin-animation-time,
+              $point-count * 2 * ($i - 1)));
       }
     }
   }

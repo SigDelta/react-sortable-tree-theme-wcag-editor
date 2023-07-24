@@ -1,19 +1,19 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { AppContainer } from 'react-hot-loader'; // eslint-disable-line import/no-extraneous-dependencies
+import ReactDOM from 'react-dom/client';
 
 const rootEl = document.getElementById('app');
-const render = Component => {
-  ReactDOM.render(
-    <AppContainer>
-      <Component />
-    </AppContainer>,
-    rootEl
-  );
+
+const render = (Component) => {
+  ReactDOM.createRoot(rootEl).render(<Component />);
 };
 
-/* eslint-disable global-require, import/newline-after-import */
-render(require('./app').default);
-if (module.hot)
-  module.hot.accept('./app', () => render(require('./app').default));
-/* eslint-enable global-require, import/newline-after-import */
+const renderApp = () => {
+  const App = require('./app').default;
+  render(App);
+};
+
+renderApp();
+
+if (module.hot) {
+  module.hot.accept('./app', renderApp);
+}
