@@ -7,7 +7,9 @@ $hover-padding: 3px;
   padding: 0;
   height: 100%;
   box-sizing: border-box;
-  cursor: move;
+  width: fit-content;
+  border-radius: 3px;
+  margin: 1px 0;
 
   &:active {
     opacity: 1;
@@ -15,7 +17,7 @@ $hover-padding: 3px;
 }
 
 .rowWrapperDragDisabled {
-  cursor: default;
+  cursor: not-allowed;
   user-select: none;
 
   &:hover {
@@ -49,7 +51,7 @@ $hover-padding: 3px;
   }
 
   &::before {
-    background-color: rgb(190, 213, 216);
+    background-color: rgba(190, 213, 216, 0.644);
     opacity: 0.8;
     content: '';
     position: absolute;
@@ -58,6 +60,7 @@ $hover-padding: 3px;
     bottom: 0;
     left: 0;
     z-index: -1;
+    border-radius: 3px
   }
 }
 
@@ -76,14 +79,25 @@ $hover-padding: 3px;
  * Nodes matching the search conditions are highlighted
  */
 .rowSearchMatch {
-  outline: solid 1px #0080ff;
+  background:  #81bfdb !important;
+
+  & .rowTitle, & .rowSubtitle, & .collapseButton  {
+    color: black !important;
+  }
+}
+
+.collapseButtonDark {
+  color: black !important;
 }
 
 /**
  * The node that matches the search conditions and is currently focused
  */
 .rowSearchFocus {
-  outline: solid 1px #fc6421;
+  background: #63a7c7 !important;
+  & .rowTitle, & .rowSubtitle  {
+    color: black !important;
+  }
 }
 
 %rowItem {
@@ -96,12 +110,17 @@ $hover-padding: 3px;
   position: relative;
   height: 100%;
   min-width: 230px;
-  flex: 1 0 auto;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background-color: transparent;
-  padding: 10px 10px 10px 32px;
+  padding: 7px 10px 7px 32px;
+  border-radius: 3px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.048)
+  }
 }
 
 .rowLabel {
