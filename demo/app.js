@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
-import SortableTree, { toggleExpandedForAll } from '@nosferatu500/react-sortable-tree';
+import  { toggleExpandedForAll, SortableTreeWithoutDndContext as SortableTree } from '@nosferatu500/react-sortable-tree';
 import CustomTheme from '../index';
+import ExternalNode, {externalNodeType} from "./externalSourceNode";
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import './app.css';
 
 class App extends Component {
@@ -86,9 +89,12 @@ class App extends Component {
       });
 
     return (
+      <DndProvider backend={HTML5Backend}>
+        <ExternalNode node={{ title: 'Tag: P' }} />
       <div
         style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
       >
+          <div>
         <div style={{ flex: '0 0 auto', padding: '0 15px' }}>
           <h3>Full Node Drag Theme</h3>
           <button onClick={this.expandAll}>Expand All</button>
@@ -137,7 +143,8 @@ class App extends Component {
           </form>
         </div>
 
-        <div style={{ flex: '1 0 50%', padding: '0 0 0 15px', height: '400px' }}>
+
+        <div style={{ flex: '1 0 50%', padding: '50px 15px', height: '400px' }}>
           <SortableTree
             theme={CustomTheme}
             treeData={treeData}
@@ -159,9 +166,12 @@ class App extends Component {
                 <button onClick={() => alertNodeInfo(rowInfo)}>i</button>,
               ],
             })}
+                dndType={externalNodeType}
           />
+            </div>
+            </div>
         </div>
-      </div>
+        </DndProvider>
     );
   }
 }

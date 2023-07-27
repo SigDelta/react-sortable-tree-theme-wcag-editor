@@ -54,7 +54,7 @@ class MinimalThemeTreeNodeRenderer extends Component {
     }
 
     return connectDropTarget(
-      <div {...otherProps} onMouseOver={this.bound.handleMouseOver} onMouseLeave={this.bound.handleMouseLeave} {...otherProps} onFocus={ () => {} } className={styles.node + (this.state.highlight ? ` ${styles.highlight}` : '') + (dropType ? ` ${styles[dropType]}` : '')}>
+      <div {...otherProps} onMouseOver={this.bound.handleMouseOver} onMouseLeave={this.bound.handleMouseLeave} {...otherProps} onFocus={ () => {} } className={styles.node + (this.state.highlight ? ` ${styles.highlight}` : '') + (dropType ? ` ${styles[dropType]}` : '')} ref={(node) => (this.node = node)}>
         <div
           className={styles.nodeContent}
           style={{paddingLeft: scaffoldBlockPxWidth * scaffoldBlockCount}}
@@ -72,6 +72,7 @@ class MinimalThemeTreeNodeRenderer extends Component {
     );
   }
 }
+
 MinimalThemeTreeNodeRenderer.defaultProps = {
   swapFrom: null,
   swapDepth: null,
