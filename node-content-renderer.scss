@@ -3,9 +3,28 @@
 $row-padding: 2px;
 $hover-padding: 3px;
 
+.nodeInput {
+  box-sizing: border-box;
+  padding: 4px 5px;
+  background-color: transparent;
+  font-size: inherit;
+  color: white;
+  box-shadow: none;
+  transform: translateX(-5px);
+  outline: 2px solid rgb(63, 178, 255);
+  border: none;
+  border-radius: 2px;
+}
+
+.nodeInputHidden {
+  display: none;
+  visibility: hidden;
+}
+
 .rowWrapper {
   padding: 0;
-  height: 100%;
+  height: 32px;
+  max-height: 32px;
   box-sizing: border-box;
   width: fit-content;
   border-radius: 3px;
@@ -60,7 +79,7 @@ $hover-padding: 3px;
     bottom: 0;
     left: 0;
     z-index: -1;
-    border-radius: 3px
+    border-radius: 3px;
   }
 }
 
@@ -79,9 +98,11 @@ $hover-padding: 3px;
  * Nodes matching the search conditions are highlighted
  */
 .rowSearchMatch {
-  background:  #81bfdb !important;
+  background: #81bfdb !important;
 
-  & .rowTitle, & .rowSubtitle, & .collapseButton  {
+  & .rowTitle,
+  & .rowSubtitle,
+  & .collapseButton {
     color: black !important;
   }
 }
@@ -95,7 +116,8 @@ $hover-padding: 3px;
  */
 .rowSearchFocus {
   background: #63a7c7 !important;
-  & .rowTitle, & .rowSubtitle  {
+  & .rowTitle,
+  & .rowSubtitle {
     color: black !important;
   }
 }
@@ -119,7 +141,7 @@ $hover-padding: 3px;
   border-radius: 3px;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.048)
+    background: rgba(255, 255, 255, 0.048);
   }
 }
 
@@ -209,8 +231,8 @@ $hover-padding: 3px;
     &:nth-of-type(#{$i}),
     &:nth-of-type(#{math.div($i + $point-count, 2)}) {
       &:before {
-        animation-delay: - $spin-animation-time + (math.div($spin-animation-time,
-              $point-count * 2 * ($i - 1)));
+        animation-delay: -$spin-animation-time +
+          (math.div($spin-animation-time, $point-count * 2 * ($i - 1)));
       }
     }
   }
@@ -253,7 +275,9 @@ $hover-padding: 3px;
   cursor: pointer;
   z-index: 1000;
   transform: translateY(-50%);
-  &:focus {outline:0;}
+  &:focus {
+    outline: 0;
+  }
   color: #d9d9d9;
   font-size: 10px;
 }
@@ -264,13 +288,13 @@ $hover-padding: 3px;
 
 .collapseButton {
   &:before {
-    content: "\25bc";
+    content: '\25bc';
   }
 }
 
 .expandButton {
   &:before {
-    content:"\25b6";
+    content: '\25b6';
   }
 }
 

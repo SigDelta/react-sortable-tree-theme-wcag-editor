@@ -10,11 +10,11 @@
 // nodeContentRenderer: PropTypes.func,
 // placeholderRenderer: PropTypes.func,
 
-import nodeContentRenderer from './node-content-renderer';
+import nodeContentRenderer from './node-content-renderer'
 import treeNodeRenderer from './tree-node-renderer'
 
 module.exports = {
   nodeContentRenderer,
   treeNodeRenderer,
-  scaffoldBlockPxWidth: 20
-};
+  scaffoldBlockPxWidth: 20,
+}

@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import styles from './node-content-renderer.scss';
+import React, { useEffect, useRef } from 'react'
+import PropTypes from 'prop-types'
+import styles from './node-content-renderer.scss'
+import useOnOutsideClick from './useOnOutsideClick'
 
 function isDescendant(older, younger) {
   return (
@@ -9,145 +10,178 @@ function isDescendant(older, younger) {
     older.children.some(
       child => child === younger || isDescendant(child, younger)
     )
-  );
+  )
 }
 
 // eslint-disable-next-line react/prefer-stateless-function
-class MinimalThemeNodeContentRenderer extends Component {
-  render() {
-    const {
-      scaffoldBlockPxWidth,
-      toggleChildrenVisibility,
-      connectDragPreview,
-      connectDragSource,
-      isDragging,
-      canDrop,
-      canDrag,
-      node,
-      title,
-      subtitle,
-      draggedNode,
-      path,
-      treeIndex,
-      isSearchMatch,
-      isSearchFocus,
-      icons,
-      buttons,
-      className,
-      style,
-      didDrop,
-      swapFrom,
-      swapLength,
-      swapDepth,
-      treeId, // Not needed, but preserved for other renderers
-      isOver, // Not needed, but preserved for other renderers
-      parentNode, // Needed for dndManager
-      rowDirection,
-      scaffoldBlockCount,
-      ...otherProps
-    } = this.props;
-    const nodeTitle = title || node.title;
-    const nodeSubtitle = subtitle || node.subtitle;
-    const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
-    const isLandingPadActive = !didDrop && isDragging;
-    const nodeContent = connectDragPreview( <div
-        className={
-          styles.rowContents +
-          (isSearchMatch ? ` ${styles.rowSearchMatch}` : '') +
-          (isSearchFocus ? ` ${styles.rowSearchFocus}` : '') +
-          (!canDrag ? ` ${styles.rowContentsDragDisabled}` : '')
-        }
-      >
-        <div className={styles.rowLabel}>
-          <span
-            className={
-              styles.rowTitle +
-              (node.subtitle ? ` ${styles.rowTitleWithSubtitle}` : '')
-            }
-          >
-            {typeof nodeTitle === 'function'
-              ? nodeTitle({
+function MinimalThemeNodeContentRenderer(props) {
+  const {
+    scaffoldBlockPxWidth,
+    toggleChildrenVisibility,
+    connectDragPreview,
+    connectDragSource,
+    isDragging,
+    canDrop,
+    canDrag,
+    node,
+    title,
+    subtitle,
+    draggedNode,
+    path,
+    treeIndex,
+    isSearchMatch,
+    isSearchFocus,
+    icons,
+    buttons,
+    className,
+    style,
+    didDrop,
+    swapFrom,
+    swapLength,
+    swapDepth,
+    treeId, // Not needed, but preserved for other renderers
+    isOver, // Not needed, but preserved for other renderers
+    parentNode, // Needed for dndManager
+    rowDirection,
+    scaffoldBlockCount,
+    updateNode,
+    ...otherProps
+  } = props
+  const nodeTitle = title || node.title
+  const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node)
+  const isLandingPadActive = !didDrop && isDragging
+  const inputRef = useRef(null)
+  // const handleFocus = (event) => event.target.select();
+
+  useEffect(() => {
+    if (node.isEditing) {
+      inputRef.current.focus()
+      inputRef.current.select()
+    }
+  }, [node.isEditing])
+
+  const nodeContent = connectDragPreview(
+    <div
+      className={
+        styles.rowContents +
+        (isSearchMatch ? ` ${styles.rowSearchMatch}` : '') +
+        (isSearchFocus ? ` ${styles.rowSearchFocus}` : '') +
+        (!canDrag ? ` ${styles.rowContentsDragDisabled}` : '')
+      }
+    >
+      <div className={styles.rowLabel}>
+        <span
+          className={
+            styles.rowTitle +
+            (node.subtitle ? ` ${styles.rowTitleWithSubtitle}` : '')
+          }
+        >
+          {node.isEditing ? null : nodeTitle}
+          <input
+            ref={inputRef}
+            className={`${styles.nodeInput} ${
+              node.isEditing ? '' : styles.nodeInputHidden
+            }`}
+            value={nodeTitle}
+            // onFocus={handleFocus}
+
+            onChange={event => {
+              const newTitle = event.target.value
+              updateNode({ ...node, title: newTitle })
+            }}
+          />
+        </span>
+      </div>
+    </div>
+  )
+
+  const nodeRef = useRef()
+  useOnOutsideClick(nodeRef, () =>
+    node.isEditing
+      ? updateNode({
+          ...node,
+          isEditing: false,
+          dragTemporarilyDisabled: false,
+          title: nodeTitle || node.prevTitle,
+          prevTitle: undefined,
+        })
+      : null
+  )
+
+  return (
+    <div style={{ height: '100%' }} {...otherProps}>
+      {toggleChildrenVisibility &&
+        node.children &&
+        (node.children.length > 0 || typeof node.children === 'function') && (
+          <div>
+            <button
+              type="button"
+              aria-label={node.expanded ? 'Collapse' : 'Expand'}
+              className={
+                (node.expanded ? styles.collapseButton : styles.expandButton) +
+                (isSearchMatch ? ` ${styles.collapseButtonDark}` : '')
+              }
+              onClick={() =>
+                toggleChildrenVisibility({
                   node,
                   path,
                   treeIndex,
                 })
-              : nodeTitle}
-          </span>
+              }
+              style={{
+                marginLeft: scaffoldBlockPxWidth * scaffoldBlockCount,
+              }}
+            />
 
-          {nodeSubtitle && (
-            <span className={styles.rowSubtitle}>
-              {typeof nodeSubtitle === 'function'
-                ? nodeSubtitle({
-                    node,
-                    path,
-                    treeIndex,
-                  })
-                : nodeSubtitle}
-            </span>
-          )}
-        </div>
-      </div>
-    );
-
-    return (
-      <div style={{ height: '100%' }} {...otherProps}>
-        {toggleChildrenVisibility &&
-          node.children &&
-          (node.children.length > 0 || typeof node.children === 'function') && (
-            <div>
-              <button
-                type="button"
-                aria-label={node.expanded ? 'Collapse' : 'Expand'}
-                className={
-                  (node.expanded ? styles.collapseButton : styles.expandButton) +
-                    (isSearchMatch ? ` ${styles.collapseButtonDark}` : '')
-                }
-                onClick={() =>
-                  toggleChildrenVisibility({
-                    node,
-                    path,
-                    treeIndex,
-                  })
-                }
-              style={{marginLeft: scaffoldBlockPxWidth * scaffoldBlockCount }}
+            {node.expanded && !isDragging && (
+              <div
+                style={{ width: scaffoldBlockPxWidth }}
+                className={styles.lineChildren}
               />
+            )}
+          </div>
+        )}
 
-              {node.expanded &&
-                !isDragging && (
-                  <div
-                    style={{ width: scaffoldBlockPxWidth }}
-                    className={styles.lineChildren}
-                  />
-                )}
-            </div>
-          )}
+      <div
+        onDoubleClick={() => {
+          updateNode({
+            ...node,
+            isEditing: true,
+            dragTemporarilyDisabled: true,
+            prevTitle: node.title,
+          })
 
+          if (inputRef.current) {
+            inputRef.current.focus()
+            inputRef.current.select()
+            console.log('focus')
+          }
+        }}
+        ref={nodeRef}
+        className={
+          styles.rowWrapper +
+          (!canDrag ? ` ${styles.rowWrapperDragDisabled}` : '')
+        }
+      >
         <div
           className={
-            styles.rowWrapper +
-            (!canDrag ? ` ${styles.rowWrapperDragDisabled}` : '')
+            styles.row +
+            (isLandingPadActive ? ` ${styles.rowLandingPad}` : '') +
+            (isLandingPadActive && !canDrop ? ` ${styles.rowCancelPad}` : '') +
+            (className ? ` ${className}` : '')
           }
+          style={{
+            opacity: isDraggedDescendant ? 0.5 : 1,
+            ...style,
+          }}
         >
-          <div
-            className={
-              styles.row +
-              (isLandingPadActive ? ` ${styles.rowLandingPad}` : '') +
-              (isLandingPadActive && !canDrop ? ` ${styles.rowCancelPad}` : '') +
-              (className ? ` ${className}` : '')
-            }
-            style={{
-              opacity: isDraggedDescendant ? 0.5 : 1,
-              ...style,
-            }}
-          >
-            {canDrag
-              ? connectDragSource(nodeContent, { dropEffect: 'copy' })
-              : nodeContent}
-          </div>
+          {canDrag
+            ? connectDragSource(nodeContent, { dropEffect: 'copy' })
+            : nodeContent}
         </div>
       </div>
-    );
-  }
+    </div>
+  )
 }
 
 MinimalThemeNodeContentRenderer.defaultProps = {
@@ -167,8 +201,8 @@ MinimalThemeNodeContentRenderer.defaultProps = {
   swapLength: null,
   title: null,
   toggleChildrenVisibility: null,
-  rowDirection: 'ltr'
-};
+  rowDirection: 'ltr',
+}
 
 MinimalThemeNodeContentRenderer.propTypes = {
   buttons: PropTypes.arrayOf(PropTypes.node),
@@ -203,7 +237,7 @@ MinimalThemeNodeContentRenderer.propTypes = {
   // Drop target
   canDrop: PropTypes.bool,
   isOver: PropTypes.bool.isRequired,
-  rowDirection: PropTypes.string.isRequired
-};
+  rowDirection: PropTypes.string.isRequired,
+}
 
-export default MinimalThemeNodeContentRenderer;
+export default MinimalThemeNodeContentRenderer

@@ -1,39 +1,40 @@
-const path = require('path');
-const webpack = require('webpack');
-const autoprefixer = require('autoprefixer');
-const nodeExternals = require('webpack-node-externals');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const path = require('path')
+const webpack = require('webpack')
+const autoprefixer = require('autoprefixer')
+const nodeExternals = require('webpack-node-externals')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
-const target = process.env.TARGET || 'umd';
+const target = process.env.TARGET || 'umd'
 
 module.exports = {
   optimization: {
-    minimizer: [new UglifyJsPlugin()]
-  }
+    minimizer: [new UglifyJsPlugin()],
+  },
 }
 
 const styleLoader = {
   loader: 'style-loader',
   options: { insert: 'head' },
-};
+}
 
 const fileLoader = {
   loader: 'file-loader',
   options: { name: 'static/[name].[ext]' },
-};
+}
 
 const postcssLoader = {
   loader: 'postcss-loader',
   options: {
     postcssOptions: {
-
       plugins: () => [
-        autoprefixer({ browsersList: ['IE >= 11', 'last 2 versions', '> 1%'] }),
+        autoprefixer({
+          browsersList: ['IE >= 11', 'last 2 versions', '> 1%'],
+        }),
       ],
     },
-  }
-};
+  },
+}
 
 const cssLoader = isLocal => ({
   loader: 'css-loader',
@@ -43,7 +44,7 @@ const cssLoader = isLocal => ({
     importLoaders: true,
     localIdentName: isLocal ? 'rstcustom__[local]' : null,
   },
-});
+})
 
 const config = {
   entry: './index',
@@ -54,9 +55,7 @@ const config = {
     library: 'ReactSortableTreeThemeFileExplorer',
   },
   devtool: 'source-map',
-  plugins: [
-    new webpack.EnvironmentPlugin({ NODE_ENV: 'development' }),
-  ],
+  plugins: [new webpack.EnvironmentPlugin({ NODE_ENV: 'development' })],
   module: {
     rules: [
       {
@@ -76,7 +75,7 @@ const config = {
       },
     ],
   },
-};
+}
 
 switch (target) {
   case 'umd':
@@ -86,20 +85,20 @@ switch (target) {
         // load non-javascript files with extensions, presumably via loaders
         allowlist: [/\.(?!(?:jsx?|json)$).{1,5}$/i],
       }),
-    ];
-    break;
+    ]
+    break
   case 'development':
-    config.devtool = 'eval';
+    config.devtool = 'eval'
     config.module.rules.push({
       test: /\.(jpe?g|png|gif|ico|svg)$/,
       use: [fileLoader],
       exclude: path.join(__dirname, 'node_modules'),
-    });
-    config.entry = ['react-hot-loader/patch', './demo/index'];
+    })
+    config.entry = ['react-hot-loader/patch', './demo/index']
     config.output = {
       path: path.join(__dirname, 'build'),
       filename: 'static/[name].js',
-    };
+    }
     config.plugins = [
       new HtmlWebpackPlugin({
         inject: true,
@@ -107,24 +106,24 @@ switch (target) {
       }),
       new webpack.EnvironmentPlugin({ NODE_ENV: 'development' }),
       new webpack.NoEmitOnErrorsPlugin(),
-    ];
+    ]
     config.devServer = {
       // contentBase: path.join(__dirname, 'build'),
       port: process.env.PORT || 3001,
-    };
+    }
 
-    break;
+    break
   case 'demo':
     config.module.rules.push({
       test: /\.(jpe?g|png|gif|ico|svg)$/,
       use: [fileLoader],
       exclude: path.join(__dirname, 'node_modules'),
-    });
-    config.entry = './demo/index';
+    })
+    config.entry = './demo/index'
     config.output = {
       path: path.join(__dirname, 'build'),
       filename: 'static/[name].js',
-    };
+    }
     config.plugins = [
       new HtmlWebpackPlugin({
         inject: true,
@@ -136,10 +135,10 @@ switch (target) {
           warnings: false,
         },
       }),
-    ];
+    ]
 
-    break;
+    break
   default:
 }
 
-module.exports = config;
+module.exports = config
