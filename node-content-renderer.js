@@ -51,7 +51,6 @@ function MinimalThemeNodeContentRenderer(props) {
   const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node)
   const isLandingPadActive = !didDrop && isDragging
   const inputRef = useRef(null)
-  // const handleFocus = (event) => event.target.select();
 
   useEffect(() => {
     if (node.isEditing) {
@@ -83,8 +82,6 @@ function MinimalThemeNodeContentRenderer(props) {
               node.isEditing ? '' : styles.nodeInputHidden
             }`}
             value={nodeTitle}
-            // onFocus={handleFocus}
-
             onChange={event => {
               const newTitle = event.target.value
               updateNode({ ...node, title: newTitle })
@@ -96,17 +93,19 @@ function MinimalThemeNodeContentRenderer(props) {
   )
 
   const nodeRef = useRef()
-  useOnOutsideClick(nodeRef, () =>
-    node.isEditing
-      ? updateNode({
-          ...node,
-          isEditing: false,
-          dragTemporarilyDisabled: false,
-          title: nodeTitle || node.prevTitle,
-          prevTitle: undefined,
-        })
-      : null
-  )
+
+  useOnOutsideClick(nodeRef, () => {
+    if (node.isEditing || node.isSelected) {
+      updateNode({
+        ...node,
+        isEditing: false,
+        dragTemporarilyDisabled: false,
+        title: nodeTitle || node.prevTitle,
+        prevTitle: undefined,
+        isSelected: undefined,
+      })
+    }
+  })
 
   return (
     <div style={{ height: '100%' }} {...otherProps}>
@@ -142,7 +141,7 @@ function MinimalThemeNodeContentRenderer(props) {
           </div>
         )}
 
-      <div
+      <button
         onDoubleClick={() => {
           updateNode({
             ...node,
@@ -150,18 +149,16 @@ function MinimalThemeNodeContentRenderer(props) {
             dragTemporarilyDisabled: true,
             prevTitle: node.title,
           })
-
-          if (inputRef.current) {
-            inputRef.current.focus()
-            inputRef.current.select()
-            console.log('focus')
-          }
+        }}
+        onClick={() => {
+          updateNode({ ...node, isSelected: true })
         }}
         ref={nodeRef}
-        className={
-          styles.rowWrapper +
-          (!canDrag ? ` ${styles.rowWrapperDragDisabled}` : '')
-        }
+        className={`${styles.rowWrapper} ${
+          !canDrag ? ` ${styles.rowWrapperDragDisabled} ` : ''
+        }${node.isSelected ? ` ${styles.rowWrapperSelected} ` : ''}${
+          node.title
+        }`}
       >
         <div
           className={
@@ -179,7 +176,7 @@ function MinimalThemeNodeContentRenderer(props) {
             ? connectDragSource(nodeContent, { dropEffect: 'copy' })
             : nodeContent}
         </div>
-      </div>
+      </button>
     </div>
   )
 }

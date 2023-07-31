@@ -4,13 +4,13 @@ $row-padding: 2px;
 $hover-padding: 3px;
 
 .nodeInput {
+  transform: translate(-5px, 1px); // ugly adjust the input position
   box-sizing: border-box;
   padding: 4px 5px;
   background-color: transparent;
   font-size: inherit;
   color: white;
   box-shadow: none;
-  transform: translateX(-5px);
   outline: 2px solid rgb(63, 178, 255);
   border: none;
   border-radius: 2px;
@@ -29,19 +29,23 @@ $hover-padding: 3px;
   width: fit-content;
   border-radius: 3px;
   margin: 1px 0;
+  background: transparent;
+  border: none;
+  text-align: left;
+  display: block;
 
   &:active {
     opacity: 1;
   }
 }
 
+.rowWrapperSelected {
+  background-color: rgba(205, 218, 221, 0.295);
+}
+
 .rowWrapperDragDisabled {
   cursor: not-allowed;
   user-select: none;
-
-  &:hover {
-    opacity: 1;
-  }
 }
 
 .row {
@@ -90,7 +94,7 @@ $hover-padding: 3px;
   @extend .rowLandingPad;
 
   &::before {
-    background-color: #929292;
+    background-color: #c77a7a46;
   }
 }
 
@@ -104,6 +108,10 @@ $hover-padding: 3px;
   & .rowSubtitle,
   & .collapseButton {
     color: black !important;
+  }
+
+  & .nodeInput {
+    outline-color: rgb(255, 255, 255);
   }
 }
 
@@ -244,7 +252,7 @@ $hover-padding: 3px;
 
 .rowTitle {
   font-weight: normal;
-  font-size: 80%;
+  font-size: 90%;
   color: white;
 }
 
