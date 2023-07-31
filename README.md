@@ -1,39 +1,13 @@
-# Minimal React Sortable Tree Theme
-<img alt="theme appearance" src="./example-resource/main.png" width="500">
+# Local development
 
-## Features
-* Minimalistic Theme for React Sortable Tree
+To run the demo follow this steps:
 
-## Usage
+1. Run `yarn` to install dependencies
+2. Run `yarn start` to open the dev server
 
-```sh
-npm install --save react-sortable-tree-theme-minimal
-```
+To use the theme in your project:
 
-```jsx
-import React, { Component } from 'react';
-import SortableTree from 'react-sortable-tree';
-import FileExplorerTheme from 'react-sortable-tree-theme-minimal';
-
-export default class Tree extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      treeData: [{ title: 'src/', children: [ { title: 'index.js' } ] }],
-    };
-  }
-
-  render() {
-    return (
-      <div style={{ height: 400 }}>
-        <SortableTree
-          treeData={this.state.treeData}
-          onChange={treeData => this.setState({ treeData })}
-          theme={FileExplorerTheme}
-        />
-      </div>
-    );
-  }
-}
-```
+1. Bump up the package by running `npm version <patch|minor|major>`
+2. Publish the package to the registry of your choice `npm publish --registry=<path to your registry>` (for testing purposes you can use local registry such as [verdaccio](https://github.com/verdaccio/verdaccio))
+3. Install the theme in your app `npm i react-sortable-tree-theme-wcag-editor` or `yarn add react-sortable-tree-theme-wcag-editor`
+4. Import the theme and pass it as a props to the tree component (check out the [example](https://github.com/lifejuggler/react-sortable-tree-theme-minimal))
