@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import styles from './node-content-renderer.scss'
-import useOnOutsideClick from './useOnOutsideClick'
 
 function isDescendant(older, younger) {
   return (
@@ -45,6 +44,8 @@ function MinimalThemeNodeContentRenderer(props) {
     rowDirection,
     scaffoldBlockCount,
     updateNode,
+    rowHeight,
+    virtuosoRef,
     ...otherProps
   } = props
   const nodeTitle = title || node.title
@@ -92,21 +93,6 @@ function MinimalThemeNodeContentRenderer(props) {
     </div>
   )
 
-  const nodeRef = useRef()
-
-  useOnOutsideClick(nodeRef, () => {
-    if (node.isEditing || node.isSelected) {
-      updateNode({
-        ...node,
-        isEditing: false,
-        dragTemporarilyDisabled: false,
-        title: nodeTitle || node.prevTitle,
-        prevTitle: undefined,
-        isSelected: undefined,
-      })
-    }
-  })
-
   return (
     <div style={{ height: '100%' }} {...otherProps}>
       {toggleChildrenVisibility &&
@@ -150,15 +136,13 @@ function MinimalThemeNodeContentRenderer(props) {
             prevTitle: node.title,
           })
         }}
-        onClick={() => {
-          updateNode({ ...node, isSelected: true })
+        onClick={(event) => {
+          // TODO make nodes 100% width of the tree
+          updateNode({ ...node, isSelected: true }, event)
         }}
-        ref={nodeRef}
         className={`${styles.rowWrapper} ${
           !canDrag ? ` ${styles.rowWrapperDragDisabled} ` : ''
-        }${node.isSelected ? ` ${styles.rowWrapperSelected} ` : ''}${
-          node.title
-        }`}
+        }${node.isSelected ? ` ${styles.rowWrapperSelected} ` : ''}`}
       >
         <div
           className={

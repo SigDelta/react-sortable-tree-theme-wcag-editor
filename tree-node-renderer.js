@@ -36,6 +36,7 @@ class MinimalThemeTreeNodeRenderer extends Component {
       getPrevRow, // Delete from otherProps
       node, // Delete from otherProps
       path, // Delete from otherProps
+      rowHeight,
       ...otherProps
     } = this.props
     // Construct the scaffold representing the structure of the tree

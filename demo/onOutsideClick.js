@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
 
-function useOnOutsideClick(ref, callback) {
+function useOnOutsideClick(element, callback) {
   useEffect(() => {
     const handleClickOutside = event => {
-      if (ref.current && !ref.current.contains(event.target)) {
+      if (element && !element.contains(event.target)) {
         callback(event)
         document.removeEventListener('click', handleClickOutside)
       }
@@ -23,7 +23,7 @@ function useOnOutsideClick(ref, callback) {
       document.removeEventListener('click', handleClickOutside)
       document.removeEventListener('keydown', handleKeyboardEvent)
     }
-  }, [ref, callback])
+  }, [element, callback])
 }
 
 export default useOnOutsideClick
