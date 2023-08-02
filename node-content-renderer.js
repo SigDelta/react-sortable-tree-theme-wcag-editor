@@ -12,8 +12,7 @@ function isDescendant(older, younger) {
   )
 }
 
-// eslint-disable-next-line react/prefer-stateless-function
-function MinimalThemeNodeContentRenderer(props) {
+const MinimalThemeNodeContentRenderer = props => {
   const {
     scaffoldBlockPxWidth,
     toggleChildrenVisibility,
@@ -136,7 +135,7 @@ function MinimalThemeNodeContentRenderer(props) {
             prevTitle: node.title,
           })
         }}
-        onClick={(event) => {
+        onClick={event => {
           // TODO make nodes 100% width of the tree
           updateNode({ ...node, isSelected: true }, event)
         }}
@@ -183,6 +182,10 @@ MinimalThemeNodeContentRenderer.defaultProps = {
   title: null,
   toggleChildrenVisibility: null,
   rowDirection: 'ltr',
+  scaffoldBlockCount: null,
+  updateNode: null,
+  rowHeight: null,
+  virtuosoRef: null,
 }
 
 MinimalThemeNodeContentRenderer.propTypes = {
@@ -192,7 +195,14 @@ MinimalThemeNodeContentRenderer.propTypes = {
   icons: PropTypes.arrayOf(PropTypes.node),
   isSearchFocus: PropTypes.bool,
   isSearchMatch: PropTypes.bool,
-  node: PropTypes.shape({}).isRequired,
+  node: PropTypes.shape({
+    isEditing: PropTypes.bool,
+    isSelected: PropTypes.bool,
+    expanded: PropTypes.bool,
+    title: PropTypes.string.isRequired,
+    children: PropTypes.node.isRequired,
+    subtitle: PropTypes.string,
+  }).isRequired,
   path: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
@@ -218,7 +228,11 @@ MinimalThemeNodeContentRenderer.propTypes = {
   // Drop target
   canDrop: PropTypes.bool,
   isOver: PropTypes.bool.isRequired,
-  rowDirection: PropTypes.string.isRequired,
+  rowDirection: PropTypes.string,
+  scaffoldBlockCount: PropTypes.number,
+  updateNode: PropTypes.func,
+  rowHeight: PropTypes.number,
+  virtuosoRef: PropTypes.shape({ current: PropTypes.shape({}) }),
 }
 
 export default MinimalThemeNodeContentRenderer

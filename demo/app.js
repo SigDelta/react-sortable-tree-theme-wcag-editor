@@ -174,22 +174,23 @@ const App = () => {
               generateNodeProps={({ node, path }) => {
                 const updateNode = (newNode, event) => {
                   setTreeData(prevTreeData => {
-                    const newTreeData = (event && event.ctrlKey) ? prevTreeData : deselectAllTreeItems(
-                      prevTreeData
-                    )
+                    const newTreeData =
+                      event && event.ctrlKey
+                        ? prevTreeData
+                        : deselectAllTreeItems(prevTreeData)
                     console.log(newTreeData, prevTreeData)
                     return changeNodeAtPath({
                       treeData: newTreeData,
                       path,
                       getNodeKey,
                       newNode,
-                    })}
-                  )
+                    })
+                  })
                 }
 
                 return {
                   updateNode,
-                  buttons: [<button onClick={() => {}}>delete</button>]
+                  buttons: [<button onClick={() => {}}>delete</button>],
                 }
               }}
               dndType={externalNodeType}
