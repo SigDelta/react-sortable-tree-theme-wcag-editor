@@ -10,11 +10,13 @@
 // nodeContentRenderer: PropTypes.func,
 // placeholderRenderer: PropTypes.func,
 
-import nodeContentRenderer from './node-content-renderer'
-import treeNodeRenderer from './tree-node-renderer'
+import nodeContentRenderer from './node-content-renderer.tsx'
+import treeNodeRenderer from './tree-node-renderer.tsx'
 
-module.exports = {
+const t  = {
   nodeContentRenderer,
   treeNodeRenderer,
   scaffoldBlockPxWidth: 20,
 }
+
+export default t

@@ -3,7 +3,7 @@ import {
   toggleExpandedForAll,
   SortableTreeWithoutDndContext as SortableTree,
   changeNodeAtPath,
-} from '@nosferatu500/react-sortable-tree'
+} from 'react-sortable-tree-test'
 import CustomTheme from '../index'
 import ExternalNode, { externalNodeType } from './externalSourceNode'
 import { DndProvider } from 'react-dnd'

@@ -47,6 +47,9 @@ const cssLoader = isLocal => ({
 })
 
 const config = {
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
+  },
   entry: './index',
   output: {
     path: path.join(__dirname, 'dist'),
@@ -59,7 +62,12 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
+        test: /\.(ts|tsx)$/,
+        use: ['babel-loader'],
+        exclude: path.join(__dirname, 'node_modules'),
+      },
+      {
+        test: /\.(js|jsx)$/,
         use: ['babel-loader'],
         exclude: path.join(__dirname, 'node_modules'),
       },
@@ -108,7 +116,7 @@ switch (target) {
       new webpack.NoEmitOnErrorsPlugin(),
     ]
     config.devServer = {
-      // contentBase: path.join(__dirname, 'build'),
+      static: path.join(__dirname, 'build'),
       port: process.env.PORT || 3001,
     }
 

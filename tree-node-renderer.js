@@ -1,101 +1,86 @@
-import React, { Component, Children, cloneElement } from 'react'
-import PropTypes from 'prop-types'
-import styles from './tree-node-renderer.scss'
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import styles from './tree-node-renderer.scss';
 
-class MinimalThemeTreeNodeRenderer extends Component {
-  constructor(props) {
-    super(props)
+function MinimalThemeTreeNodeRenderer(props) {
+  const {
+    children,
+    scaffoldBlockPxWidth,
+    lowerSiblingCounts,
+    connectDropTarget,
+    isOver,
+    draggedNode,
+    canDrop,
+    treeIndex,
+    treeId,
+    listIndex,
+    rowDirection,
+    getPrevRow, // Delete from otherProps
+    node, // Delete from otherProps
+    path, // Delete from otherProps
+    rowHeight,
+    ...otherProps
+  } = props;
 
-    this.state = {}
-    this.bound = {
-      handleMouseOver: this.handleMouseOver.bind(this),
-      handleMouseLeave: this.handleMouseLeave.bind(this),
-    }
+  const [highlight, setHighlight] = useState(false);
+
+  // Construct the scaffold representing the structure of the tree
+  const scaffoldBlockCount = lowerSiblingCounts.length - 1;
+  let dropType;
+  if (canDrop && !isOver) {
+    dropType = 'validDrop';
+  } else if (!canDrop && isOver) {
+    dropType = 'invalidDrop';
   }
 
-  handleMouseOver() {}
+  const handleMouseOver = () => {
+    setHighlight(true);
+  };
 
-  handleMouseLeave() {}
+  const handleMouseLeave = () => {
+    setHighlight(false);
+  };
 
-  render() {
-    const {
-      children,
-      swapFrom,
-      swapLength,
-      swapDepth,
-      scaffoldBlockPxWidth,
-      lowerSiblingCounts,
-      connectDropTarget,
-      isOver,
-      draggedNode,
-      canDrop,
-      treeIndex,
-      treeId,
-      listIndex,
-      rowDirection,
-      getPrevRow, // Delete from otherProps
-      node, // Delete from otherProps
-      path, // Delete from otherProps
-      rowHeight,
-      ...otherProps
-    } = this.props
-    // Construct the scaffold representing the structure of the tree
-    const scaffoldBlockCount = lowerSiblingCounts.length - 1
-    let dropType
-    if (canDrop && !isOver) {
-      dropType = 'validDrop'
-    } else if (!canDrop && isOver) {
-      dropType = 'invalidDrop'
-    }
-
-    return connectDropTarget(
+  return connectDropTarget(
+    <div
+      {...otherProps}
+      onMouseOver={handleMouseOver}
+      onMouseLeave={handleMouseLeave}
+      onFocus={() => {}}
+      className={
+        styles.node +
+        (highlight ? ` ${styles.highlight}` : '') +
+        (dropType ? ` ${styles[dropType]}` : '')
+      }
+      ref={(node) => (this.node = node)}
+    >
       <div
-        {...otherProps}
-        onMouseOver={this.bound.handleMouseOver}
-        onMouseLeave={this.bound.handleMouseLeave}
-        {...otherProps}
-        onFocus={() => {}}
-        className={
-          styles.node +
-          (this.state.highlight ? ` ${styles.highlight}` : '') +
-          (dropType ? ` ${styles[dropType]}` : '')
-        }
-        ref={node => (this.node = node)}
+        className={styles.nodeContent}
+        style={{
+          paddingLeft: scaffoldBlockPxWidth * scaffoldBlockCount,
+        }}
       >
-        <div
-          className={styles.nodeContent}
-          style={{
-            paddingLeft: scaffoldBlockPxWidth * scaffoldBlockCount,
-          }}
-        >
-          {Children.map(children, child =>
-            cloneElement(child, {
-              isOver,
-              canDrop,
-              draggedNode,
-              scaffoldBlockCount,
-            })
-          )}
-        </div>
+        {React.Children.map(children, (child) =>
+          React.cloneElement(child, {
+            isOver,
+            canDrop,
+            draggedNode,
+            scaffoldBlockCount,
+          })
+        )}
       </div>
-    )
-  }
+    </div>
+  );
 }
 
 MinimalThemeTreeNodeRenderer.defaultProps = {
-  swapFrom: null,
-  swapDepth: null,
-  swapLength: null,
   canDrop: false,
   draggedNode: null,
   rowDirection: 'ltr',
-}
+};
 
 MinimalThemeTreeNodeRenderer.propTypes = {
   treeIndex: PropTypes.number.isRequired,
-  swapFrom: PropTypes.number,
-  swapDepth: PropTypes.number,
-  swapLength: PropTypes.number,
   scaffoldBlockPxWidth: PropTypes.number.isRequired,
   lowerSiblingCounts: PropTypes.arrayOf(PropTypes.number).isRequired,
   treeId: PropTypes.string.isRequired,
@@ -115,6 +100,6 @@ MinimalThemeTreeNodeRenderer.propTypes = {
   path: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
-}
+};
 
-export default MinimalThemeTreeNodeRenderer
+export default MinimalThemeTreeNodeRenderer;
