@@ -7,12 +7,12 @@ function isDescendant(older, younger) {
     !!older.children &&
     typeof older.children !== 'function' &&
     older.children.some(
-      child => child === younger || isDescendant(child, younger)
+      (child) => child === younger || isDescendant(child, younger)
     )
   )
 }
 
-const MinimalThemeNodeContentRenderer = props => {
+const MinimalThemeNodeContentRenderer = (props) => {
   const {
     scaffoldBlockPxWidth,
     toggleChildrenVisibility,
@@ -82,7 +82,7 @@ const MinimalThemeNodeContentRenderer = props => {
               node.isEditing ? '' : styles.nodeInputHidden
             }`}
             value={nodeTitle}
-            onChange={event => {
+            onChange={(event) => {
               const newTitle = event.target.value
               updateNode({ ...node, title: newTitle })
             }}
@@ -135,7 +135,7 @@ const MinimalThemeNodeContentRenderer = props => {
             prevTitle: node.title,
           })
         }}
-        onClick={event => {
+        onClick={(event) => {
           // TODO make nodes 100% width of the tree
           updateNode({ ...node, isSelected: true }, event)
         }}

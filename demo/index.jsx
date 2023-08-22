@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 
 const rootEl = document.getElementById('app')
 
-const render = Component => {
+const render = (Component) => {
   ReactDOM.createRoot(rootEl).render(<Component />)
 }
 

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import styles from './tree-node-renderer.scss';
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
+import styles from './tree-node-renderer.scss'
 
 function MinimalThemeTreeNodeRenderer(props) {
   const {
@@ -20,26 +20,26 @@ function MinimalThemeTreeNodeRenderer(props) {
     path, // Delete from otherProps
     rowHeight,
     ...otherProps
-  } = props;
+  } = props
 
-  const [highlight, setHighlight] = useState(false);
+  const [highlight, setHighlight] = useState(false)
 
   // Construct the scaffold representing the structure of the tree
-  const scaffoldBlockCount = lowerSiblingCounts.length - 1;
-  let dropType;
+  const scaffoldBlockCount = lowerSiblingCounts.length - 1
+  let dropType
   if (canDrop && !isOver) {
-    dropType = 'validDrop';
+    dropType = 'validDrop'
   } else if (!canDrop && isOver) {
-    dropType = 'invalidDrop';
+    dropType = 'invalidDrop'
   }
 
   const handleMouseOver = () => {
-    setHighlight(true);
-  };
+    setHighlight(true)
+  }
 
   const handleMouseLeave = () => {
-    setHighlight(false);
-  };
+    setHighlight(false)
+  }
 
   return connectDropTarget(
     <div
@@ -70,14 +70,14 @@ function MinimalThemeTreeNodeRenderer(props) {
         )}
       </div>
     </div>
-  );
+  )
 }
 
 MinimalThemeTreeNodeRenderer.defaultProps = {
   canDrop: false,
   draggedNode: null,
   rowDirection: 'ltr',
-};
+}
 
 MinimalThemeTreeNodeRenderer.propTypes = {
   treeIndex: PropTypes.number.isRequired,
@@ -100,6 +100,6 @@ MinimalThemeTreeNodeRenderer.propTypes = {
   path: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
-};
+}
 
-export default MinimalThemeTreeNodeRenderer;
+export default MinimalThemeTreeNodeRenderer

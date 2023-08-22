@@ -2,14 +2,14 @@ import { useEffect } from 'react'
 
 function useOnOutsideClick(element, callback) {
   useEffect(() => {
-    const handleClickOutside = event => {
+    const handleClickOutside = (event) => {
       if (element && !element.contains(event.target)) {
         callback(event)
         document.removeEventListener('click', handleClickOutside)
       }
     }
 
-    const handleKeyboardEvent = event => {
+    const handleKeyboardEvent = (event) => {
       if (event.key === 'Escape' || event.key === 'Enter') {
         callback(event)
         document.removeEventListener('keydown', handleKeyboardEvent)

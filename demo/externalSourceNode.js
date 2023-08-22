@@ -4,7 +4,7 @@ import { DragSource } from 'react-dnd'
 export const externalNodeType = 'yourNodeType'
 const externalNodeSpec = {
   // This needs to return an object with a property `node` in it.
-  beginDrag: componentProps => ({ node: { ...componentProps.node } }),
+  beginDrag: (componentProps) => ({ node: { ...componentProps.node } }),
 }
 
 const externalNodeCollect = (connect /* , monitor */) => ({
@@ -13,7 +13,7 @@ const externalNodeCollect = (connect /* , monitor */) => ({
   // didDrop: monitor.didDrop(),
 })
 
-const externalNodeBaseComponent = props => {
+const externalNodeBaseComponent = (props) => {
   const { connectDragSource, node } = props
 
   return connectDragSource(

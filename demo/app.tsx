@@ -11,26 +11,58 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import './app.css'
 import onOutsideClick from './onOutsideClick'
 
+const data = [
+  {
+    title: 'Chicken',
+    id: 1,
+    expanded: true,
+    children: [{ title: 'Egg', id: 5 }],
+  },
+  { title: 'Cow', id: 2, expanded: true, children: [{ title: 'Milk', id: 6 }] },
+  {
+    title: 'Sheep',
+    id: 3,
+    expanded: true,
+    children: [{ title: 'Wool', id: 7 }],
+  },
+  { title: 'Pig', id: 4, expanded: true, children: [{ title: 'Meet', id: 8 }] },
+  {
+    title: 'Chicken 2',
+    id: 9,
+    expanded: true,
+    children: [{ title: 'Egg 2', id: 13 }],
+  },
+  {
+    title: 'Cow 2',
+    id: 10,
+    expanded: true,
+    children: [{ title: 'Milk 2', id: 14 }],
+  },
+  {
+    title: 'Sheep 2',
+    id: 11,
+    expanded: true,
+    children: [{ title: 'Wool 2', id: 15 }],
+  },
+  {
+    title: 'Pig 2',
+    id: 12,
+    expanded: true,
+    children: [{ title: 'Meet 2', id: 16 }],
+  },
+]
+
 const App = () => {
   const [searchString, setSearchString] = useState('')
   const [searchFocusIndex, setSearchFocusIndex] = useState(0)
   const [searchFoundCount, setSearchFoundCount] = useState(null)
+  const [treeData, setTreeData] = useState(data)
   const virtuosoRef = useRef(null)
-
-  const [treeData, setTreeData] = useState([
-    { title: 'Node 1' },
-    { title: 'Node 2' },
-    {
-      title: 'This node is not draggable',
-      dragDisabled: true,
-    },
-    { title: 'Chicken', children: [{ title: 'Egg' }] },
-  ])
 
   function deselectAllTreeItems(tree) {
     if (!Array.isArray(tree)) return []
 
-    return tree.map(node => {
+    return tree.map((node) => {
       const newNode = { ...node }
 
       if (newNode.isSelected !== undefined) {
@@ -52,7 +84,7 @@ const App = () => {
 
   const handleOnOutsideClick = () => {
     const updatedTreeData = deselectAllTreeItems(treeData)
-    setTreeData(prevTreeData => updatedTreeData)
+    setTreeData((prevTreeData) => updatedTreeData)
   }
 
   onOutsideClick(
@@ -60,8 +92,8 @@ const App = () => {
     handleOnOutsideClick
   )
 
-  const expand = expanded => {
-    setTreeData(prevTreeData =>
+  const expand = (expanded) => {
+    setTreeData((prevTreeData) =>
       toggleExpandedForAll({
         treeData: prevTreeData,
         expanded,
@@ -78,7 +110,7 @@ const App = () => {
   }
 
   const selectPrevMatch = () => {
-    setSearchFocusIndex(prevIndex =>
+    setSearchFocusIndex((prevIndex) =>
       prevIndex !== null
         ? (searchFoundCount + prevIndex - 1) % searchFoundCount
         : searchFoundCount - 1
@@ -86,12 +118,12 @@ const App = () => {
   }
 
   const selectNextMatch = () => {
-    setSearchFocusIndex(prevIndex =>
+    setSearchFocusIndex((prevIndex) =>
       prevIndex !== null ? (prevIndex + 1) % searchFoundCount : 0
     )
   }
 
-  const getNodeKey = ({ treeIndex }) => treeIndex
+  const getNodeKey = ({ node }) => node.id
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -111,7 +143,7 @@ const App = () => {
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <form
               style={{ display: 'inline-block' }}
-              onSubmit={event => {
+              onSubmit={(event) => {
                 event.preventDefault()
               }}
             >
@@ -121,7 +153,7 @@ const App = () => {
                   id="find-box"
                   type="text"
                   value={searchString}
-                  onChange={event => setSearchString(event.target.value)}
+                  onChange={(event) => setSearchString(event.target.value)}
                 />
               </label>
 
@@ -158,42 +190,43 @@ const App = () => {
             }}
           >
             <SortableTree
+              getNodeKey={getNodeKey}
               theme={CustomTheme}
               treeData={treeData}
               onChange={setTreeData}
-              searchQuery={searchString}
-              searchFocusOffset={searchFocusIndex}
+              // searchQuery={searchString}
+              // searchFocusOffset={searchFocusIndex}
               style={{ width: '600px' }}
-              virtuosoRef={virtuosoRef}
-              searchFinishCallback={matches =>
-                setSearchFoundCount(matches.length)
-              }
+              // virtuosoRef={virtuosoRef}
+              // searchFinishCallback={matches =>
+              //   setSearchFoundCount(matches.length)
+              // }
               canDrag={({ node }) =>
                 !node.dragDisabled && !node.dragTemporarilyDisabled
               }
-              generateNodeProps={({ node, path }) => {
-                const updateNode = (newNode, event) => {
-                  setTreeData(prevTreeData => {
-                    const newTreeData =
-                      event && event.ctrlKey
-                        ? prevTreeData
-                        : deselectAllTreeItems(prevTreeData)
-                    console.log(newTreeData, prevTreeData)
-                    return changeNodeAtPath({
-                      treeData: newTreeData,
-                      path,
-                      getNodeKey,
-                      newNode,
-                    })
-                  })
-                }
+              // generateNodeProps={({ node, path }) => {
+              //   // const updateNode = (newNode, event) => {
+              //   //   setTreeData(prevTreeData => {
+              //   //     const newTreeData =
+              //   //       event && event.ctrlKey
+              //   //         ? prevTreeData
+              //   //         : deselectAllTreeItems(prevTreeData)
+              //   //     console.log(newTreeData, prevTreeData)
+              //   //     return changeNodeAtPath({
+              //   //       treeData: newTreeData,
+              //   //       path,
+              //   //       getNodeKey,
+              //   //       newNode,
+              //   //     })
+              //   //   })
+              //   // }
 
-                return {
-                  updateNode,
-                  buttons: [<button onClick={() => {}}>delete</button>],
-                }
-              }}
-              dndType={externalNodeType}
+              //   // return {
+              //   //   updateNode,
+              //   //   buttons: [<button onClick={() => {}}>delete</button>],
+              //   // }
+              // }}
+              // dndType={externalNodeType}
             />
           </div>
         </div>
@@ -203,3 +236,28 @@ const App = () => {
 }
 
 export default App
+
+// import React, { useState } from 'react'
+// import SortableTree from 'react-sortable-tree-test'
+// // In your own app, you would need to use import styles once in the app
+// // import 'react-sortable-tree/styles.css';
+
+// const SelectMultipleNodes: React.FC = () => {
+//   const [treeData, setTreeData] = useState(data);
+//    const getNodeKey = ({ node: { id } }: any) => id
+//   return (
+//     <div style={{ height: 600, width: 700 }}>
+//       <SortableTree
+//         treeData={treeData}
+//         theme={CustomTheme}
+//         onChange={setTreeData}
+//         onDragStateChanged={(params) => {
+
+//         }}
+//         getNodeKey={getNodeKey}
+//       />
+//     </div>
+//   )
+// }
+
+// export default SelectMultipleNodes;

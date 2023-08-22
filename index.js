@@ -13,7 +13,7 @@
 import nodeContentRenderer from './node-content-renderer.tsx'
 import treeNodeRenderer from './tree-node-renderer.tsx'
 
-const t  = {
+const t = {
   nodeContentRenderer,
   treeNodeRenderer,
   scaffoldBlockPxWidth: 20,

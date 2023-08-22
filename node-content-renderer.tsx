@@ -1,7 +1,7 @@
 import React from 'react'
 import { ConnectDragPreview, ConnectDragSource } from 'react-dnd'
-import styles from './node-content-renderer.scss'
 import { NodeData, TreeItem, TreeNode } from 'react-sortable-tree-test'
+import styles from './node-content-renderer.scss'
 import { classnames } from './utils'
 
 const defaultProps = {
@@ -95,7 +95,10 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     ...otherProps
   } = props
 
-  const isOneofParentNodes = (assumedParentPath: (string | number) [], assumedChildPath: (string | number)[]) => {
+  const isOneofParentNodes = (
+    assumedParentPath: (string | number)[],
+    assumedChildPath: (string | number)[]
+  ) => {
     return assumedParentPath.every(
       (pathCrumb, index) => pathCrumb === assumedChildPath[index]
     )
@@ -113,29 +116,65 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     (selectedNode) => getNodeKey({ node: selectedNode }) === nodeKey
   )
 
-  let handle
-  if (canDrag) {
-    handle =
-      typeof node.children === 'function' && node.expanded ? (
-        <div className="rst__loadingHandle">
-          <div className="rst__loadingCircle">
-            {Array.from({ length: 12 }).map((_, index) => (
-              <div
-                key={index}
-                className={classnames(
-                  'rst__loadingCirclePoint',
-                  rowDirectionClass ?? ''
-                )}
-              />
-            ))}
-          </div>
-        </div>
-      ) : (
-        connectDragSource(<div className="rst__moveHandle" />, {
-          dropEffect: 'copy',
-        })
-      )
+  const getNodeTitle = () => {
+    if (!node.isEditing) {
+      return typeof nodeTitle === 'function'
+        ? nodeTitle({
+            node,
+            path,
+            treeIndex,
+          })
+        : nodeTitle
+    }
+    return null
   }
+
+  const draggedNodePreview = connectDragPreview(
+    <div
+      className={classnames(
+        isSelected || isAnyParentSelected ? 'rst__rowContentsSelected' : '',
+        rowDirectionClass ?? '',
+        styles.rowContents +
+          (isSearchMatch ? ` ${styles.rowSearchMatch}` : '') +
+          (isSearchFocus ? ` ${styles.rowSearchFocus}` : '') +
+          (!canDrag ? ` ${styles.rowContentsDragDisabled}` : '')
+      )}
+    >
+      <div className={classnames(styles.rowLabel, rowDirectionClass ?? '')}>
+        <span
+          className={classnames(
+            styles.rowTitle +
+              (node.subtitle ? ` ${styles.rowTitleWithSubtitle}` : '')
+          )}
+        >
+          {getNodeTitle()}
+          <input
+            // ref={inputRef}
+            className={`${styles.nodeInput} ${
+              node.isEditing ? '' : styles.nodeInputHidden
+            }`}
+            value={nodeTitle}
+            onChange={(event) => {
+              const newTitle = event.target.value
+              // updateNode({ ...node, title: newTitle })
+            }}
+          />
+        </span>
+
+        {nodeSubtitle && (
+          <span className="rst__rowSubtitle">
+            {typeof nodeSubtitle === 'function'
+              ? nodeSubtitle({
+                  node,
+                  path,
+                  treeIndex,
+                })
+              : nodeSubtitle}
+          </span>
+        )}
+      </div>
+    </div>
+  )
 
   const isLandingPadActive = !didDrop && isDragging
 
@@ -173,52 +212,6 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     <div>Multiple nodes are being dragged...</div>
   )
 
-  const draggedNodePreview = (
-    <div
-      className={classnames(
-        'rst__rowContents',
-        canDrag ? '' : 'rst__rowContentsDragDisabled',
-        isSelected || isAnyParentSelected ? 'rst__rowContentsSelected' : '',
-        rowDirectionClass ?? ''
-      )}>
-      <div className={classnames('rst__rowLabel', rowDirectionClass ?? '')}>
-        <span
-          className={classnames(
-            'rst__rowTitle',
-            node.subtitle ? 'rst__rowTitleWithSubtitle' : ''
-          )}>
-          {typeof nodeTitle === 'function'
-            ? nodeTitle({
-                node,
-                path,
-                treeIndex,
-              })
-            : nodeTitle}
-        </span>
-
-        {nodeSubtitle && (
-          <span className="rst__rowSubtitle">
-            {typeof nodeSubtitle === 'function'
-              ? nodeSubtitle({
-                  node,
-                  path,
-                  treeIndex,
-                })
-              : nodeSubtitle}
-          </span>
-        )}
-      </div>
-
-      <div className="rst__rowToolbar">
-        {buttons?.map((btn, index) => (
-          <div key={index} className="rst__toolbarButton">
-            {btn}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-
   return (
     <div style={{ height: '100%' }} {...otherProps} onClick={handleSelectNode}>
       {toggleChildrenVisibility &&
@@ -229,8 +222,8 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
               type="button"
               aria-label={node.expanded ? 'Collapse' : 'Expand'}
               className={classnames(
-                node.expanded ? 'rst__collapseButton' : 'rst__expandButton',
-                rowDirectionClass ?? ''
+                (node.expanded ? styles.collapseButton : styles.expandButton) +
+                  (isSearchMatch ? ` ${styles.collapseButtonDark}` : '')
               )}
               style={buttonStyle}
               onClick={() =>
@@ -238,28 +231,62 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
                   node,
                   path,
                   treeIndex,
-                })
-              }
+                })}
             />
-
-            {node.expanded && !isDragging && (
-              <div
-                style={{ width: scaffoldBlockPxWidth }}
-                className={classnames(
-                  'rst__lineChildren',
-                  rowDirectionClass ?? ''
-                )}
-              />
-            )}
           </div>
         )}
+      {node.expanded && !isDragging && (
+        <div
+          style={{ width: scaffoldBlockPxWidth }}
+          className={classnames(styles.lineChildren, rowDirectionClass ?? '')}
+        />
+      )}
 
-      <div className={classnames('rst__rowWrapper', rowDirectionClass ?? '')}>
-        {/* Set the row preview to be used during drag and drop */}
+      <button
+        onDoubleClick={() => {
+          // updateNode({
+          //   ...node,
+          //   isEditing: true,
+          //   dragTemporarilyDisabled: true,
+          //   prevTitle: node.title,
+          // })
+        }}
+        onClick={(event) => {
+          // TODO make nodes 100% width of the tree
+          // updateNode({ ...node, isSelected: true }, event)
+        }}
+        className={`${styles.rowWrapper} ${
+          !canDrag ? ` ${styles.rowWrapperDragDisabled} ` : ''
+        }${node.isSelected ? ` ${styles.rowWrapperSelected} ` : ''}`}
+      >
+        <div
+          className={
+            styles.row +
+            (isLandingPadActive ? ` ${styles.rowLandingPad}` : '') +
+            (isLandingPadActive && !canDrop ? ` ${styles.rowCancelPad}` : '') +
+            (className ? ` ${className}` : '')
+          }
+          style={{
+            opacity: isDraggedDescendant ? 0.5 : 1,
+            ...style,
+          }}
+        >
+          {areMultipleNodesBeingDragged ? multipleDraggedNodesPreview : null}
+          {canDrag
+            ? connectDragSource(draggedNodePreview, { dropEffect: 'copy' })
+            : draggedNodePreview}
+        </div>
+      </button>
+
+      {/* <div className={classnames('rst__rowWrapper', rowDirectionClass ?? '')}>
+         Set the row preview to be used during drag and drop
         {connectDragPreview(
           <div
             className={classnames(
-              'rst__row',
+                         styles.row +
+            (isLandingPadActive ? ` ${styles.rowLandingPad}` : '') +
+            (isLandingPadActive && !canDrop ? ` ${styles.rowCancelPad}` : '') +
+            (className ? ` ${className}` : ''),
               isLandingPadActive ? 'rst__rowLandingPad' : '',
               isLandingPadActive && !canDrop ? 'rst__rowCancelPad' : '',
               isSearchMatch ? 'rst__rowSearchMatch' : '',
@@ -274,10 +301,13 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
             {handle}
             {areMultipleNodesBeingDragged
               ? multipleDraggedNodesPreview
-              : draggedNodePreview}
+              : null}
           </div>
         )}
-      </div>
+                  {canDrag
+            ? connectDragSource(draggedNodePreview, { dropEffect: 'copy' })
+            : draggedNodePreview}
+      </div> */}
     </div>
   )
 }

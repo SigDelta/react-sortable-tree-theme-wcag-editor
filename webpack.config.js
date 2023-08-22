@@ -36,7 +36,7 @@ const postcssLoader = {
   },
 }
 
-const cssLoader = isLocal => ({
+const cssLoader = (isLocal) => ({
   loader: 'css-loader',
   options: {
     modules: true,
