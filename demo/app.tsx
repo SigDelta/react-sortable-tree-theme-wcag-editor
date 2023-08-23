@@ -4,10 +4,10 @@ import {
   SortableTreeWithoutDndContext as SortableTree,
   changeNodeAtPath,
 } from 'react-sortable-tree-test'
-import CustomTheme from '../index'
-import ExternalNode, { externalNodeType } from './externalSourceNode'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import CustomTheme from '../index'
+import ExternalNode, { externalNodeType } from './externalSourceNode'
 import './app.css'
 import onOutsideClick from './onOutsideClick'
 
@@ -202,31 +202,30 @@ const App = () => {
               //   setSearchFoundCount(matches.length)
               // }
               canDrag={({ node }) =>
-                !node.dragDisabled && !node.dragTemporarilyDisabled
-              }
-              // generateNodeProps={({ node, path }) => {
-              //   // const updateNode = (newNode, event) => {
-              //   //   setTreeData(prevTreeData => {
-              //   //     const newTreeData =
-              //   //       event && event.ctrlKey
-              //   //         ? prevTreeData
-              //   //         : deselectAllTreeItems(prevTreeData)
-              //   //     console.log(newTreeData, prevTreeData)
-              //   //     return changeNodeAtPath({
-              //   //       treeData: newTreeData,
-              //   //       path,
-              //   //       getNodeKey,
-              //   //       newNode,
-              //   //     })
-              //   //   })
-              //   // }
+                !node.dragDisabled && !node.dragTemporarilyDisabled}
+              generateNodeProps={({ node, path }) => {
+                const updateNode = (newNode, event) => {
+                  setTreeData((prevTreeData) => {
+                    const newTreeData =
+                      event && event.ctrlKey
+                        ? prevTreeData
+                        : deselectAllTreeItems(prevTreeData)
+                    console.log(newTreeData, prevTreeData)
+                    return changeNodeAtPath({
+                      treeData: newTreeData,
+                      path,
+                      getNodeKey,
+                      newNode,
+                    })
+                  })
+                }
 
-              //   // return {
-              //   //   updateNode,
-              //   //   buttons: [<button onClick={() => {}}>delete</button>],
-              //   // }
-              // }}
-              // dndType={externalNodeType}
+                return {
+                  updateNode,
+                  buttons: [<button onClick={() => {}}>delete</button>],
+                }
+              }}
+              dndType={externalNodeType}
             />
           </div>
         </div>

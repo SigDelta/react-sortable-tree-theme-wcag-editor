@@ -80,7 +80,8 @@ const MinimalThemeNodeContentRenderer = (props) => {
             ref={inputRef}
             className={`${styles.nodeInput} ${
               node.isEditing ? '' : styles.nodeInputHidden
-            }`}
+              }`}
+
             value={nodeTitle}
             onChange={(event) => {
               const newTitle = event.target.value

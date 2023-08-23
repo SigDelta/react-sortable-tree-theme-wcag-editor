@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { ConnectDragPreview, ConnectDragSource } from 'react-dnd'
 import { NodeData, TreeItem, TreeNode } from 'react-sortable-tree-test'
 import styles from './node-content-renderer.scss'
@@ -92,8 +92,17 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     selectedNodes,
     getNodeKey,
     isDraggedDescendant,
+    updateNode,
     ...otherProps
   } = props
+
+  const inputRef = useRef(null)
+  useEffect(() => {
+    if (node.isEditing && inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.select()
+    }
+  }, [node.isEditing])
 
   const isOneofParentNodes = (
     assumedParentPath: (string | number)[],
@@ -129,7 +138,16 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     return null
   }
 
-  const draggedNodePreview = connectDragPreview(
+  const areMultipleNodesBeingDragged =
+    draggedNode &&
+    getNodeKey({ node: draggedNode }) === nodeKey &&
+    selectedNodes.length > 1
+
+  const multipleDraggedNodesPreview = (
+    <div>Multiple nodes are being dragged...</div>
+  )
+
+  const nodeContent = connectDragPreview(
     <div
       className={classnames(
         isSelected || isAnyParentSelected ? styles.rowSelected : '',
@@ -149,17 +167,28 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
         >
           {getNodeTitle()}
           <input
-            // ref={inputRef}
+            onBlur={() =>
+              updateNode({
+                ...node,
+                title: node.title ? node.title : node.prevTitle,
+                isEditing: false,
+                prevTitle: undefined,
+              })
+            }
+            onClick={(e) => e.stopPropagation()}
             className={`${styles.nodeInput} ${
               node.isEditing ? '' : styles.nodeInputHidden
             }`}
+            ref={inputRef}
             value={nodeTitle}
             onChange={(event) => {
               const newTitle = event.target.value
-              // updateNode({ ...node, title: newTitle })
+              updateNode({ ...node, title: newTitle })
             }}
           />
         </span>
+
+        {areMultipleNodesBeingDragged ? multipleDraggedNodesPreview : null}
 
         {nodeSubtitle && (
           <span className="rst__rowSubtitle">
@@ -183,11 +212,16 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     buttonStyle = { right: -0.5 * scaffoldBlockPxWidth, left: 0 }
   }
 
-  const handleSelectNode = () => {
+  const handleSelectNode = (e) => {
+    console.log(e.ctrlKey, isAnyParentSelected && !isSelected && !e.ctrlKey)
     if (isAnyParentSelected && !isSelected) {
       // TODO invert the condition?
     } else {
       updateSelectedNodes((prevNodesList) => {
+        if (!e.ctrlKey) {
+          return isSelected ? [] : [{ ...node, path }]
+        }
+
         return isSelected
           ? prevNodesList.filter(
               (selectedNode) =>
@@ -203,38 +237,8 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     }
   }
 
-  const areMultipleNodesBeingDragged =
-    draggedNode &&
-    getNodeKey({ node: draggedNode }) === nodeKey &&
-    selectedNodes.length > 1
-
-  const multipleDraggedNodesPreview = (
-    <div>Multiple nodes are being dragged...</div>
-  )
-
   return (
-    <div style={{ height: '100%' }} {...otherProps} onClick={handleSelectNode}>
-      {toggleChildrenVisibility &&
-        node.children &&
-        (node.children.length > 0 || typeof node.children === 'function') && (
-          <div>
-            <button
-              type="button"
-              aria-label={node.expanded ? 'Collapse' : 'Expand'}
-              className={classnames(
-                (node.expanded ? styles.collapseButton : styles.expandButton) +
-                  (isSearchMatch ? ` ${styles.collapseButtonDark}` : '')
-              )}
-              style={buttonStyle}
-              onClick={() =>
-                toggleChildrenVisibility({
-                  node,
-                  path,
-                  treeIndex,
-                })}
-            />
-          </div>
-        )}
+    <div style={{ height: '100%' }} {...otherProps}>
       {node.expanded && !isDragging && (
         <div
           style={{ width: scaffoldBlockPxWidth }}
@@ -243,22 +247,50 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
       )}
 
       <button
-        onDoubleClick={() => {
-          // updateNode({
-          //   ...node,
-          //   isEditing: true,
-          //   dragTemporarilyDisabled: true,
-          //   prevTitle: node.title,
-          // })
+        onDoubleClick={(e) => {
+          if (!e.ctrlKey) {
+            updateNode({
+              ...node,
+              isEditing: true,
+              dragTemporarilyDisabled: true,
+              prevTitle: node.title,
+            })
+            updateSelectedNodes(() => [])
+          }
         }}
-        onClick={(event) => {
-          // TODO make nodes 100% width of the tree
-          // updateNode({ ...node, isSelected: true }, event)
-        }}
+        onClick={handleSelectNode}
         className={`${styles.rowWrapper} ${
           !canDrag ? ` ${styles.rowWrapperDragDisabled} ` : ''
-        }${node.isSelected ? ` ${styles.rowWrapperSelected} ` : ''}`}
+        }${
+          isAnyParentSelected || isSelected
+            ? ` ${styles.rowWrapperSelected} `
+            : ''
+        }`}
       >
+        {toggleChildrenVisibility &&
+          node.children &&
+          (node.children.length > 0 || typeof node.children === 'function') && (
+            <div>
+              <button
+                type="button"
+                aria-label={node.expanded ? 'Collapse' : 'Expand'}
+                className={classnames(
+                  (node.expanded
+                    ? styles.collapseButton
+                    : styles.expandButton) +
+                    (isSearchMatch ? ` ${styles.collapseButtonDark}` : '')
+                )}
+                style={buttonStyle}
+                onClick={() =>
+                  toggleChildrenVisibility({
+                    node,
+                    path,
+                    treeIndex,
+                  })
+                }
+              />
+            </div>
+          )}
         <div
           className={
             styles.row +
@@ -272,41 +304,10 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
           }}
         >
           {canDrag
-            ? connectDragSource(draggedNodePreview, { dropEffect: 'copy' })
-            : draggedNodePreview}
+            ? connectDragSource(nodeContent, { dropEffect: 'copy' })
+            : nodeContent}
         </div>
       </button>
-
-      {/* <div className={classnames('rst__rowWrapper', rowDirectionClass ?? '')}>
-         Set the row preview to be used during drag and drop
-        {connectDragPreview(
-          <div
-            className={classnames(
-                         styles.row +
-            (isLandingPadActive ? ` ${styles.rowLandingPad}` : '') +
-            (isLandingPadActive && !canDrop ? ` ${styles.rowCancelPad}` : '') +
-            (className ? ` ${className}` : ''),
-              isLandingPadActive ? 'rst__rowLandingPad' : '',
-              isLandingPadActive && !canDrop ? 'rst__rowCancelPad' : '',
-              isSearchMatch ? 'rst__rowSearchMatch' : '',
-              isSearchFocus ? 'rst__rowSearchFocus' : '',
-              rowDirectionClass ?? '',
-              className ?? ''
-            )}
-            style={{
-              opacity: isDraggedDescendant ? 0.5 : 1,
-              ...style,
-            }}>
-            {handle}
-            {areMultipleNodesBeingDragged
-              ? multipleDraggedNodesPreview
-              : null}
-          </div>
-        )}
-                  {canDrag
-            ? connectDragSource(draggedNodePreview, { dropEffect: 'copy' })
-            : draggedNodePreview}
-      </div> */}
     </div>
   )
 }
