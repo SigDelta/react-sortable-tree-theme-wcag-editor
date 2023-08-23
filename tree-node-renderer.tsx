@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react'
 import { ConnectDropTarget } from 'react-dnd'
+import { TreeItem, TreePath } from 'react-sortable-tree-test'
 import { classnames } from './utils.ts'
 import styles from './tree-node-renderer.scss'
-import { TreeItem, TreePath } from 'react-sortable-tree-test'
 
 export interface TreeNode {
   node: TreeItem
@@ -85,18 +85,18 @@ function TreeNodeComponent(props: TreeRendererProps) {
 
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
 
-  const calculatedRowHeight = useMemo(() => {
-    if (typeof rowHeight === 'function') {
-      return rowHeight(treeIndex, _node, _path)
-    }
-    return rowHeight
-  }, [rowHeight, treeIndex, _node, _path])
+  // const calculatedRowHeight = useMemo(() => {
+  //   if (typeof rowHeight === 'function') {
+  //     return rowHeight(treeIndex, _node, _path)
+  //   }
+  //   return rowHeight
+  // }, [rowHeight, treeIndex, _node, _path])
+
   const scaffoldBlockCount = lowerSiblingCounts.length - 1
   return connectDropTarget(
     <div
       {...otherProps}
       style={{
-        height: `${calculatedRowHeight}px`,
         paddingLeft: scaffoldBlockPxWidth * scaffoldBlockCount,
       }}
       className={classnames(styles.node, rowDirectionClass ?? '')}

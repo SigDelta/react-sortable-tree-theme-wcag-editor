@@ -50,8 +50,8 @@ $hover-padding: 3px;
   }
 }
 
-.rowWrapperSelected {
-  background-color: rgba(205, 218, 221, 0.295);
+.rowSelected {
+  background-color: rgba(205, 218, 221, 0.295) !important;
 }
 
 .rowWrapperDragDisabled {
@@ -290,7 +290,7 @@ $hover-padding: 3px;
   width: 32px;
   height: 32px;
   top: 50%;
-  left: 0;
+  left: 25px;
   cursor: pointer;
   z-index: 1000;
   transform: translateY(-50%);

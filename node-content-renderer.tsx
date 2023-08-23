@@ -132,7 +132,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
   const draggedNodePreview = connectDragPreview(
     <div
       className={classnames(
-        isSelected || isAnyParentSelected ? 'rst__rowContentsSelected' : '',
+        isSelected || isAnyParentSelected ? styles.rowSelected : '',
         rowDirectionClass ?? '',
         styles.rowContents +
           (isSearchMatch ? ` ${styles.rowSearchMatch}` : '') +
@@ -271,7 +271,6 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
             ...style,
           }}
         >
-          {areMultipleNodesBeingDragged ? multipleDraggedNodesPreview : null}
           {canDrag
             ? connectDragSource(draggedNodePreview, { dropEffect: 'copy' })
             : draggedNodePreview}
