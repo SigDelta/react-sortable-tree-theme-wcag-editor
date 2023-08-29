@@ -17,7 +17,7 @@ $hover-padding: 3px;
   padding: 4px 5px;
   background-color: transparent;
   font-size: inherit;
-  color: white;
+  color: rgb(54, 54, 54);
   box-shadow: none;
   outline: 2px solid rgb(63, 178, 255);
   border: none;
@@ -51,7 +51,7 @@ $hover-padding: 3px;
 }
 
 .rowSelected {
-  background-color: rgba(205, 218, 221, 0.295) !important;
+  background-color: rgba(143, 185, 168, 0.5) !important;
 }
 
 .rowWrapperDragDisabled {
@@ -64,7 +64,7 @@ $hover-padding: 3px;
   white-space: nowrap;
   display: flex;
 
-  & > * {
+  &>* {
     box-sizing: border-box;
   }
 }
@@ -80,6 +80,7 @@ $hover-padding: 3px;
   position: relative;
   padding: 0;
   z-index: -2;
+
   * {
     opacity: 0 !important;
   }
@@ -135,6 +136,7 @@ $hover-padding: 3px;
  */
 .rowSearchFocus {
   background: #63a7c7 !important;
+
   & .rowTitle,
   & .rowSubtitle {
     color: black !important;
@@ -160,7 +162,7 @@ $hover-padding: 3px;
   border-radius: 3px;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.048);
+    background: rgba(118, 93, 105, 0.148);
   }
 }
 
@@ -182,9 +184,7 @@ $hover-padding: 3px;
 
   height: 100%;
   width: 44px;
-  background: #d9d9d9
-    url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MiIgaGVpZ2h0PSI0MiI+PGcgc3Ryb2tlPSIjRkZGIiBzdHJva2Utd2lkdGg9IjIuOSIgPjxwYXRoIGQ9Ik0xNCAxNS43aDE0LjQiLz48cGF0aCBkPSJNMTQgMjEuNGgxNC40Ii8+PHBhdGggZD0iTTE0IDI3LjFoMTQuNCIvPjwvZz4KPC9zdmc+')
-    no-repeat center;
+  background: #d9d9d9 url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MiIgaGVpZ2h0PSI0MiI+PGcgc3Ryb2tlPSIjRkZGIiBzdHJva2Utd2lkdGg9IjIuOSIgPjxwYXRoIGQ9Ik0xNCAxNS43aDE0LjQiLz48cGF0aCBkPSJNMTQgMjEuNGgxNC40Ii8+PHBhdGggZD0iTTE0IDI3LjFoMTQuNCIvPjwvZz4KPC9zdmc+') no-repeat center;
   border: solid #aaa 1px;
   box-shadow: 0 2px 2px -2px;
   cursor: move;
@@ -200,11 +200,13 @@ $hover-padding: 3px;
 }
 
 @keyframes pointFade {
+
   0%,
   19.999%,
   100% {
     opacity: 0;
   }
+
   20% {
     opacity: 1;
   }
@@ -250,8 +252,7 @@ $hover-padding: 3px;
     &:nth-of-type(#{$i}),
     &:nth-of-type(#{math.div($i + $point-count, 2)}) {
       &:before {
-        animation-delay: -$spin-animation-time +
-          (math.div($spin-animation-time, $point-count * 2 * ($i - 1)));
+        animation-delay: -$spin-animation-time + (math.div($spin-animation-time, $point-count * 2 * ($i - 1)));
       }
     }
   }
@@ -264,7 +265,7 @@ $hover-padding: 3px;
 .rowTitle {
   font-weight: normal;
   font-size: 90%;
-  color: white;
+  color: rgb(54, 54, 54);
 }
 
 .rowTitleWithSubtitle {
@@ -294,10 +295,12 @@ $hover-padding: 3px;
   cursor: pointer;
   z-index: 1000;
   transform: translate(5px, -50%);
+
   &:focus {
     outline: 0;
   }
-  color: #d9d9d9;
+
+  color: rgb(126, 126, 126);
   font-size: 10px;
 }
 
