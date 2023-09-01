@@ -212,25 +212,30 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     buttonStyle = { right: -0.5 * scaffoldBlockPxWidth, left: 0 }
   }
 
-  const handleSelectNode = () => {
-    if (isAnyParentSelected && !isSelected) {
-      // TODO invert the condition?
-    } else {
+  const getNewSelectedNodes = (e, prevNodesList) => {
+    if (!e.ctrlKey) {
+      return isSelected ? [] : [{ ...node, path }]
+    }
+
+    return isSelected
+      ? prevNodesList.filter(
+          (selectedNode) => !(getNodeKey({ node: selectedNode }) === nodeKey)
+        )
+      : [
+          ...prevNodesList.filter(
+            (prevNode) => !isOneofParentNodes(path, prevNode.path)
+          ),
+          { ...node, path },
+        ]
+  }
+
+  const handleSelectNode = (e) => {
+    if (!(isAnyParentSelected && !isSelected)) {
       updateSelectedNodes((prevNodesList) => {
-        const updatedNodesList = isSelected
-          ? prevNodesList.filter(
-              (selectedNode) =>
-                !(getNodeKey({ node: selectedNode }) === nodeKey)
-            )
-          : [
-              ...prevNodesList.filter(
-                (prevNode) => !isOneofParentNodes(path, prevNode.path)
-              ),
-              { ...node, path },
-            ]
+        const newSelectedNodes = getNewSelectedNodes(e, prevNodesList)
 
         return {
-          selectedNodesList: updatedNodesList,
+          selectedNodesList: newSelectedNodes,
           isNodeSelected: !isSelected,
           node,
         }

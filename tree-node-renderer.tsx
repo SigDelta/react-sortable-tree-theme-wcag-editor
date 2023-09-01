@@ -76,8 +76,6 @@ function TreeNodeComponent(props: TreeRendererProps) {
     ...otherProps
   } = { ...defaultProps, ...props }
 
-  console.log({ ...defaultProps, ...props })
-
   const multipleDraggingNodeDescendant =
     selectedNodes.length > 1 && isDraggedDescendant
 
