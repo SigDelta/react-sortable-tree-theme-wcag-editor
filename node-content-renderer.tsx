@@ -240,6 +240,14 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
           node,
         }
       })
+    } else if (!e.ctrlKey) {
+      updateSelectedNodes(() => {
+        return {
+          selectedNodesList: [{ ...node, path }],
+          isNodeSelected: !isSelected,
+          node,
+        }
+      })
     }
   }
 
@@ -287,13 +295,14 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
                     (isSearchMatch ? ` ${styles.collapseButtonDark}` : '')
                 )}
                 style={buttonStyle}
-                onClick={() =>
+                onClick={(e) => {
+                  e.stopPropagation()
                   toggleChildrenVisibility({
                     node,
                     path,
                     treeIndex,
                   })
-                }
+                }}
               />
             </div>
           )}
