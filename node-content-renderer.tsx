@@ -254,7 +254,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
 
       <button
         onDoubleClick={(e) => {
-          if (!e.ctrlKey) {
+          if (!e.ctrlKey && !node.editingDisabled) {
             updateNode({
               ...node,
               isEditing: true,

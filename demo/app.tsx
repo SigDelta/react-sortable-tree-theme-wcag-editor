@@ -16,6 +16,8 @@ const data = [
     title: 'Chicken',
     id: 1,
     expanded: true,
+    dragDisabled: true,
+    editingDisabled: true,
     children: [{ title: 'Egg', id: 5 }],
   },
   { title: 'Cow', id: 2, expanded: true, children: [{ title: 'Milk', id: 6 }] },
