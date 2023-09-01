@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { ConnectDragPreview, ConnectDragSource } from 'react-dnd'
-import { NodeData, TreeItem, TreeNode } from 'react-sortable-tree-test'
+import { NodeData, TreeItem, TreeNode } from 'react-sortable-tree-wcag-editor'
 import styles from './node-content-renderer.scss'
 import { classnames } from './utils'
 
@@ -212,17 +212,12 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     buttonStyle = { right: -0.5 * scaffoldBlockPxWidth, left: 0 }
   }
 
-  const handleSelectNode = (e) => {
-    console.log(e.ctrlKey, isAnyParentSelected && !isSelected && !e.ctrlKey)
+  const handleSelectNode = () => {
     if (isAnyParentSelected && !isSelected) {
       // TODO invert the condition?
     } else {
       updateSelectedNodes((prevNodesList) => {
-        if (!e.ctrlKey) {
-          return isSelected ? [] : [{ ...node, path }]
-        }
-
-        return isSelected
+        const updatedNodesList = isSelected
           ? prevNodesList.filter(
               (selectedNode) =>
                 !(getNodeKey({ node: selectedNode }) === nodeKey)
@@ -233,6 +228,12 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
               ),
               { ...node, path },
             ]
+
+        return {
+          selectedNodesList: updatedNodesList,
+          isNodeSelected: !isSelected,
+          node,
+        }
       })
     }
   }
@@ -255,7 +256,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
               dragTemporarilyDisabled: true,
               prevTitle: node.title,
             })
-            updateSelectedNodes(() => [])
+            updateSelectedNodes(() => ({ selectedNodesList: [] }))
           }
         }}
         onClick={handleSelectNode}

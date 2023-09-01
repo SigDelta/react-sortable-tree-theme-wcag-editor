@@ -3,7 +3,7 @@ import {
   toggleExpandedForAll,
   SortableTreeWithoutDndContext as SortableTree,
   changeNodeAtPath,
-} from 'react-sortable-tree-test'
+} from 'react-sortable-tree-wcag-editor'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import CustomTheme from '../index'
@@ -202,7 +202,8 @@ const App = () => {
               //   setSearchFoundCount(matches.length)
               // }
               canDrag={({ node }) =>
-                !node.dragDisabled && !node.dragTemporarilyDisabled}
+                !node.dragDisabled && !node.dragTemporarilyDisabled
+              }
               generateNodeProps={({ node, path }) => {
                 const updateNode = (newNode, event) => {
                   setTreeData((prevTreeData) => {
@@ -210,7 +211,7 @@ const App = () => {
                       event && event.ctrlKey
                         ? prevTreeData
                         : deselectAllTreeItems(prevTreeData)
-                    console.log(newTreeData, prevTreeData)
+
                     return changeNodeAtPath({
                       treeData: newTreeData,
                       path,
@@ -235,28 +236,3 @@ const App = () => {
 }
 
 export default App
-
-// import React, { useState } from 'react'
-// import SortableTree from 'react-sortable-tree-test'
-// // In your own app, you would need to use import styles once in the app
-// // import 'react-sortable-tree/styles.css';
-
-// const SelectMultipleNodes: React.FC = () => {
-//   const [treeData, setTreeData] = useState(data);
-//    const getNodeKey = ({ node: { id } }: any) => id
-//   return (
-//     <div style={{ height: 600, width: 700 }}>
-//       <SortableTree
-//         treeData={treeData}
-//         theme={CustomTheme}
-//         onChange={setTreeData}
-//         onDragStateChanged={(params) => {
-
-//         }}
-//         getNodeKey={getNodeKey}
-//       />
-//     </div>
-//   )
-// }
-
-// export default SelectMultipleNodes;

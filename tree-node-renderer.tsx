@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { ConnectDropTarget } from 'react-dnd'
-import { TreeItem, TreePath } from 'react-sortable-tree-test'
+import { TreeItem, TreePath } from 'react-sortable-tree-wcag-editor'
 import { classnames } from './utils.ts'
 import styles from './tree-node-renderer.scss'
 
@@ -76,6 +76,8 @@ function TreeNodeComponent(props: TreeRendererProps) {
     ...otherProps
   } = { ...defaultProps, ...props }
 
+  console.log({ ...defaultProps, ...props })
+
   const multipleDraggingNodeDescendant =
     selectedNodes.length > 1 && isDraggedDescendant
 
@@ -84,13 +86,6 @@ function TreeNodeComponent(props: TreeRendererProps) {
   }
 
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
-
-  // const calculatedRowHeight = useMemo(() => {
-  //   if (typeof rowHeight === 'function') {
-  //     return rowHeight(treeIndex, _node, _path)
-  //   }
-  //   return rowHeight
-  // }, [rowHeight, treeIndex, _node, _path])
 
   const scaffoldBlockCount = lowerSiblingCounts.length - 1
   return connectDropTarget(
