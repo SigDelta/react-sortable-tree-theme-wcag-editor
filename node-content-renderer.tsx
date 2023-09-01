@@ -214,7 +214,9 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
 
   const getNewSelectedNodes = (e, prevNodesList) => {
     if (!e.ctrlKey) {
-      return isSelected ? [] : [{ ...node, path }]
+      return isSelected && !(selectedNodes.length > 1)
+        ? []
+        : [{ ...node, path }]
     }
 
     return isSelected
