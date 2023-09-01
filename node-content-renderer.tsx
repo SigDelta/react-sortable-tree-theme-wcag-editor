@@ -295,6 +295,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
                     (isSearchMatch ? ` ${styles.collapseButtonDark}` : '')
                 )}
                 style={buttonStyle}
+                onDoubleClick={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation()
                   toggleChildrenVisibility({
