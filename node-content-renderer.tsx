@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { ConnectDragPreview, ConnectDragSource } from 'react-dnd'
-import { NodeData, TreeItem, TreeNode } from 'react-sortable-tree-wcag-editor'
+import { NodeData, TreeItem, find } from 'react-sortable-tree-wcag-editor'
 import styles from './node-content-renderer.scss'
 import { classnames } from './utils'
 
@@ -105,16 +105,37 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
   }, [node.isEditing])
 
   const isOneofParentNodes = (
-    assumedParentPath: (string | number)[],
-    assumedChildPath: (string | number)[]
+    assumedParentNode: TreeItem,
+    nodePath: ReturnType<typeof getNodeKey>[]
   ) => {
-    return assumedParentPath.every(
-      (pathCrumb, index) => pathCrumb === assumedChildPath[index]
+    const pathElements = nodePath.slice(0, -1)
+
+    return pathElements.some(
+      (pathCrumb) => pathCrumb === getNodeKey({ node: assumedParentNode })
+    )
+  }
+
+  const isOneofChildNodes = (
+    assumedChildNode: TreeItem,
+    testedNode: TreeItem
+  ): boolean => {
+    if (assumedChildNode.path) {
+      return isOneofParentNodes(testedNode, assumedChildNode.path)
+    }
+
+    return (
+      find({
+        treeData: [testedNode],
+        searchMethod(data) {
+          return getNodeKey(data) === getNodeKey({ node: assumedChildNode })
+        },
+        getNodeKey,
+      }).matches.length === 1
     )
   }
 
   const isAnyParentSelected = selectedNodes.some((selectedNode) =>
-    isOneofParentNodes(selectedNode.path, path)
+    isOneofParentNodes(selectedNode, path)
   )
 
   const nodeTitle = title || node.title
@@ -234,10 +255,24 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
   const handleSelectNode = (e) => {
     if (!(isAnyParentSelected && !isSelected)) {
       updateSelectedNodes((prevNodesList) => {
-        const newSelectedNodes = getNewSelectedNodes(e, prevNodesList)
+        const updatedNodesList = isSelected
+          ? prevNodesList.filter(
+              (selectedNode) =>
+                !(getNodeKey({ node: selectedNode }) === nodeKey)
+            )
+          : [
+              ...prevNodesList.filter((prevNode) => {
+                const isAnyChildOrParentSelected =
+                  isOneofParentNodes(prevNode, path) ||
+                  isOneofChildNodes(prevNode, node)
+
+                return !isAnyChildOrParentSelected
+              }),
+              { ...node, path },
+            ]
 
         return {
-          selectedNodesList: newSelectedNodes,
+          selectedNodesList: updatedNodesList,
           isNodeSelected: !isSelected,
           node,
         }

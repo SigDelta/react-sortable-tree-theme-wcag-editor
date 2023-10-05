@@ -59,6 +59,7 @@ const App = () => {
   const [searchFocusIndex, setSearchFocusIndex] = useState(0)
   const [searchFoundCount, setSearchFoundCount] = useState(null)
   const [treeData, setTreeData] = useState(data)
+  const [selectedNodes, setSelectedNodes] = useState([])
   const virtuosoRef = useRef(null)
 
   function deselectAllTreeItems(tree) {
@@ -206,6 +207,8 @@ const App = () => {
               canDrag={({ node }) =>
                 !node.dragDisabled && !node.dragTemporarilyDisabled
               }
+              selectedNodes={selectedNodes}
+              setSelectedNodes={setSelectedNodes}
               generateNodeProps={({ node, path }) => {
                 const updateNode = (newNode, event) => {
                   setTreeData((prevTreeData) => {
