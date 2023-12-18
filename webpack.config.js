@@ -3,14 +3,14 @@ const webpack = require('webpack')
 const autoprefixer = require('autoprefixer')
 const nodeExternals = require('webpack-node-externals')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const target = process.env.TARGET || 'umd'
 
 module.exports = {
-  optimization: {
-    minimizer: [new UglifyJsPlugin()],
-  },
+  // optimization: {
+  //   minimizer: [new UglifyJsPlugin()],
+  // },
 }
 
 const styleLoader = {
@@ -102,7 +102,7 @@ switch (target) {
       use: [fileLoader],
       exclude: path.join(__dirname, 'node_modules'),
     })
-    config.entry = ['react-hot-loader/patch', './demo/index']
+    config.entry = ['./demo/index']
     config.output = {
       path: path.join(__dirname, 'build'),
       filename: 'static/[name].js',
