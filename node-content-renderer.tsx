@@ -1,6 +1,12 @@
 import React, { useEffect, useRef } from 'react'
 import { ConnectDragPreview, ConnectDragSource } from 'react-dnd'
-import { NodeData, TreeItem, find } from 'react-sortable-tree-wcag-editor'
+import {
+  NodeData,
+  SelectedNode,
+  TreeItem,
+  TreeNodeId,
+  find,
+} from 'react-sortable-tree-wcag-editor'
 import styles from './node-content-renderer.scss'
 import { classnames } from './utils'
 
@@ -42,12 +48,13 @@ export interface NodeRendererProps {
   listIndex: number
   treeId: string
   rowDirection?: 'ltr' | 'rtl' | string | undefined
-  selectedNodes: TreeItem[]
+  selectedNodes: TreeNodeId[]
+  isDraggedDescendant: boolean
 
   connectDragPreview: ConnectDragPreview
   connectDragSource: ConnectDragSource
   updateSelectedNodes: (
-    inputFn: (selectedNodes: TreeItem[]) => TreeItem[]
+    inputFn: (selectedNodes: TreeNodeId[]) => SelectedNode[]
   ) => void
   parentNode?: TreeItem | undefined
   startDrag: ({ path }: { path: number[] | number[][] }) => void
@@ -57,10 +64,9 @@ export interface NodeRendererProps {
   draggedNode?: TreeItem | undefined
   isOver: boolean
   canDrop?: boolean | undefined
-  isDraggedDescendant: boolean
 }
 
-const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
+const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
   props = { ...defaultProps, ...props }
 
   const {
@@ -90,7 +96,6 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     updateSelectedNodes,
     selectedNodes,
     isDraggedDescendant,
-    updateNode,
     ...otherProps
   } = props
 
@@ -103,36 +108,30 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
   }, [node.isEditing])
 
   const isOneofParentNodes = (
-    assumedParentNode: TreeItem,
-    nodePath: TreeItem[]
+    assumedParentNodeId: TreeNodeId,
+    nodePath: TreeNodeId[]
   ) => {
     const pathElements = nodePath.slice(0, -1)
-
-    return pathElements.some(
-      (pathCrumb) => pathCrumb === assumedParentNode.nodeId
-    )
+    return pathElements.some((pathCrumb) => pathCrumb === assumedParentNodeId)
   }
 
   const isOneofChildNodes = (
-    assumedChildNode: TreeItem,
+    assumedChildNodeId: TreeNodeId,
     testedNode: TreeItem
   ): boolean => {
-    if (assumedChildNode.path) {
-      return isOneofParentNodes(testedNode, assumedChildNode.path)
+    if (testedNode.children) {
+      for (const childNode of testedNode.children) {
+        if (childNode.nodeId === assumedChildNodeId) return true
+        if (isOneofChildNodes(assumedChildNodeId, childNode)) {
+          return true
+        }
+      }
     }
-
-    return (
-      find({
-        treeData: [testedNode],
-        searchMethod(data) {
-          return data.nodeId === assumedChildNode.nodeId
-        },
-      }).matches.length === 1
-    )
+    return false
   }
 
-  const isAnyParentSelected = selectedNodes.some((selectedNode) =>
-    isOneofParentNodes(selectedNode, path)
+  const isAnyParentSelected = selectedNodes.some((selectedNodeId) =>
+    isOneofParentNodes(selectedNodeId, path)
   )
 
   const nodeTitle = title || node.title
@@ -140,7 +139,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
   const nodeKey = node.nodeId
   const isSelected = selectedNodes.some(
-    (selectedNode) => selectedNode.nodeId === nodeKey
+    (selectedNodeId) => selectedNodeId === nodeKey
   )
 
   const getNodeTitle = () => {
@@ -181,8 +180,14 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
               (node.subtitle ? ` ${styles.rowTitleWithSubtitle}` : '')
           )}
         >
-          {getNodeTitle()}
-          <input
+          {typeof nodeTitle === 'function'
+            ? nodeTitle({
+                node,
+                path,
+                treeIndex,
+              })
+            : nodeTitle}
+          {/* <input
             onBlur={() =>
               updateNode({
                 ...node,
@@ -201,7 +206,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
               const newTitle = event.target.value
               updateNode({ ...node, title: newTitle })
             }}
-          />
+          /> */}
         </span>
 
         {areMultipleNodesBeingDragged ? multipleDraggedNodesPreview : null}
@@ -218,6 +223,13 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
           </span>
         )}
       </div>
+      <div className="rst__rowToolbar">
+        {buttons?.map((btn, index) => (
+          <div key={index} className="rst__toolbarButton">
+            {btn}
+          </div>
+        ))}
+      </div>
     </div>
   )
 
@@ -228,53 +240,27 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
     buttonStyle = { right: -0.5 * scaffoldBlockPxWidth, left: 0 }
   }
 
-  const getNewSelectedNodes = (e, prevNodesList) => {
-    if (!e.ctrlKey) {
-      return isSelected && !(selectedNodes.length > 1)
-        ? []
-        : [{ ...node, path }]
-    }
-
-    return isSelected
-      ? prevNodesList.filter(
-          (selectedNode) => !(selectedNode.nodeId === nodeKey)
-        )
-      : [
-          ...prevNodesList.filter(
-            (prevNode) => !isOneofParentNodes(path, prevNode.path)
-          ),
-          { ...node, path },
-        ]
-  }
-
-  const handleSelectNode = (e) => {
-    if (!(isAnyParentSelected && !isSelected)) {
+  const handleSelectNode = () => {
+    if (isAnyParentSelected && !isSelected) {
+      // TODO invert the condition
+    } else {
       updateSelectedNodes((prevNodesList) => {
         const updatedNodesList = isSelected
           ? prevNodesList.filter(
-              (selectedNode) => !(selectedNode.nodeId === nodeKey)
+              (selectedNodeId) => !(selectedNodeId === nodeKey)
             )
           : [
-              ...prevNodesList.filter((prevNode) => {
+              ...prevNodesList.filter((prevNodeId) => {
                 const isAnyChildOrParentSelected =
-                  isOneofParentNodes(prevNode, path) ||
-                  isOneofChildNodes(prevNode, node)
-
+                  isOneofParentNodes(prevNodeId, path) ||
+                  isOneofChildNodes(prevNodeId, node)
                 return !isAnyChildOrParentSelected
               }),
-              { ...node, path },
+              node.nodeId,
             ]
 
         return {
           selectedNodesList: updatedNodesList,
-          isNodeSelected: !isSelected,
-          node,
-        }
-      })
-    } else if (!e.ctrlKey) {
-      updateSelectedNodes(() => {
-        return {
-          selectedNodesList: [{ ...node, path }],
           isNodeSelected: !isSelected,
           node,
         }

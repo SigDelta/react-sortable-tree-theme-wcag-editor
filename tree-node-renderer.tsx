@@ -1,6 +1,6 @@
 import React from 'react'
 import { ConnectDropTarget } from 'react-dnd'
-import { TreeItem, TreePath } from 'react-sortable-tree-wcag-editor'
+import { TreeItem, TreeNodeId, TreePath } from 'react-sortable-tree-wcag-editor'
 import { classnames } from './utils.ts'
 import styles from './tree-node-renderer.scss'
 
@@ -39,7 +39,7 @@ export interface TreeRendererProps {
   node: TreeItem
   path: number[]
   isDraggedDescendant: boolean
-  selectedNodes: TreeNode[]
+  selectedNodes: TreeNodeId[]
 }
 
 const defaultProps = {

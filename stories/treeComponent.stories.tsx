@@ -33,7 +33,7 @@ const data = [
     title: 'Pig',
     nodeId: 4,
     expanded: true,
-    children: [{ title: 'Meet', nodeId: 8 }],
+    children: [{ title: 'Meat', nodeId: 8 }],
   },
   {
     title: 'Chicken 2',
@@ -57,7 +57,7 @@ const data = [
     title: 'Pig 2',
     nodeId: 12,
     expanded: true,
-    children: [{ title: 'Meet 2', nodeId: 16 }],
+    children: [{ title: 'Meat 2', nodeId: 16 }],
   },
 ]
 
